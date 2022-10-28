@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stv_test/view/calendar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,16 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      home: const CalendarPage(),
     );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold();
   }
 }
