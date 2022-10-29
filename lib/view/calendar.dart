@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stv_test/constraints/color.dart';
+import 'package:stv_test/constraints/font.dart';
 
 class CalendarPage extends StatelessWidget {
   const CalendarPage({super.key});
@@ -6,14 +8,11 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// 週ヘッダー内のテキストスタイル
-    const defaultWeekHeaderTextStyle = TextStyle(fontSize: 12);
+    const defaultWeekHeaderTextStyle = TextStyle(fontSize: defaltFontSize);
     const saturdayWeekHeaderTextStyle =
-        TextStyle(fontSize: 12, color: Colors.blue);
+        TextStyle(fontSize: defaltFontSize, color: saturdayTextColor);
     const sundayWeekHeaderTextStyle =
-        TextStyle(fontSize: 12, color: Colors.red);
-
-    /// 週ヘッダー内のバックグラウンドカラー
-    const weekHeaderColor = Color.fromARGB(255, 237, 237, 237);
+        TextStyle(fontSize: defaltFontSize, color: sundayTextColor);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -71,13 +70,13 @@ class CalendarPage extends StatelessWidget {
   }
 
   Widget _dateCell(bool pran, bool today, bool saturday, bool sunday) {
-    final textColor;
+    final Color textColor;
     if (saturday) {
-      textColor = Colors.blue;
+      textColor = saturdayTextColor;
     } else if (sunday) {
-      textColor = Colors.red;
+      textColor = sundayTextColor;
     } else {
-      textColor = Colors.black;
+      textColor = defaltTextColor;
     }
 
     return Ink(
@@ -122,7 +121,6 @@ class CalendarPage extends StatelessWidget {
     );
   }
 
-  // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
   Widget weekHeader(
       Color weekHeaderColor,
       TextStyle defaultWeekHeaderTextStyle,
