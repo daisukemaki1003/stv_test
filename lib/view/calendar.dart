@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
+import 'package:stv_test/view/schedule.dart';
 
 class CalendarPage extends StatelessWidget {
   const CalendarPage({super.key});
@@ -40,36 +41,42 @@ class CalendarPage extends StatelessWidget {
             sundayWeekHeaderTextStyle,
           ),
 
-          weekRow(),
-          weekRow(),
-          weekRow(),
-          weekRow(),
-          weekRow(),
-          weekRow(),
+          weekRow(context),
+          weekRow(context),
+          weekRow(context),
+          weekRow(context),
+          weekRow(context),
+          weekRow(context),
         ],
       ),
     );
   }
 
-  Widget weekRow() {
+  Widget weekRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _dateCell(false, false, false, false),
-          _dateCell(false, false, false, false),
-          _dateCell(false, false, false, false),
-          _dateCell(false, false, false, false),
-          _dateCell(false, false, false, false),
-          _dateCell(false, false, true, false),
-          _dateCell(true, true, false, true),
+          _dateCell(false, false, false, false, context),
+          _dateCell(false, false, false, false, context),
+          _dateCell(false, false, false, false, context),
+          _dateCell(false, false, false, false, context),
+          _dateCell(false, false, false, false, context),
+          _dateCell(false, false, true, false, context),
+          _dateCell(true, true, false, true, context),
         ],
       ),
     );
   }
 
-  Widget _dateCell(bool pran, bool today, bool saturday, bool sunday) {
+  Widget _dateCell(
+    bool pran,
+    bool today,
+    bool saturday,
+    bool sunday,
+    BuildContext context,
+  ) {
     final Color textColor;
     if (saturday) {
       textColor = saturdayTextColor;
@@ -79,44 +86,59 @@ class CalendarPage extends StatelessWidget {
       textColor = defaltTextColor;
     }
 
-    return Ink(
-      height: 65,
-      width: 40,
-      child: Stack(
-        fit: StackFit.loose,
-        children: [
-          Container(
-            decoration: today
-                ? const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  )
-                : null,
-            child: Center(
-              child: Text(
-                "12",
-                style: TextStyle(
-                  color: today ? Colors.white : textColor,
-                  fontWeight: FontWeight.w400,
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                SchedulePage(),
+              ],
+            );
+          },
+        );
+      },
+      child: SizedBox(
+        height: 65,
+        width: 40,
+        child: Stack(
+          fit: StackFit.loose,
+          children: [
+            Container(
+              decoration: today
+                  ? const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    )
+                  : null,
+              child: Center(
+                child: Text(
+                  "12",
+                  style: TextStyle(
+                    color: today ? Colors.white : textColor,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          /// 予定が存在する
-          if (pran)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: Colors.black,
-                  shape: BoxShape.circle,
+            /// 予定が存在する
+            if (pran)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-            )
-        ],
+              )
+          ],
+        ),
       ),
     );
   }
