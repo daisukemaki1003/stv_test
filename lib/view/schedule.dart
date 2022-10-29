@@ -14,7 +14,7 @@ class SchedulePage extends StatelessWidget {
         children: [
           scheduleCard(),
           scheduleCard(),
-          scheduleCard(),
+          unscheduledCard(),
           scheduleCard(),
           scheduleCard(),
           scheduleCard(),
@@ -53,68 +53,55 @@ class SchedulePage extends StatelessWidget {
 
             const Divider(),
 
-            /// 予定
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Row(
-                children: [
-                  Column(
-                    children: const [
-                      Text("10:00"),
-                      Text("11:00"),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 50,
-                    child: VerticalDivider(
-                      width: 30,
-                      thickness: 5,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      "タイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトル",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Row(
-                children: [
-                  Column(
-                    children: const [
-                      Text("10:00"),
-                      Text("11:00"),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 50,
-                    child: VerticalDivider(
-                      width: 30,
-                      thickness: 5,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      "タイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトル",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            /// 予定が存在するか
+            scheduleTile(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget scheduleTile() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Row(
+        children: [
+          Column(
+            children: const [
+              Text("10:00"),
+              Text("11:00"),
+            ],
+          ),
+          const SizedBox(
+            height: 50,
+            child: VerticalDivider(
+              width: 30,
+              thickness: 5,
+              color: Colors.blue,
+            ),
+          ),
+          const Expanded(
+            child: Text(
+              "タイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトル",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  unscheduledCard() {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Center(
+          child: Text("予定がありません"),
         ),
       ),
     );
