@@ -28,6 +28,9 @@ class SchedulePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
         child: Column(
           children: [
             /// タイトル
@@ -47,7 +50,70 @@ class SchedulePage extends StatelessWidget {
                 ],
               ),
             ),
-            Divider(),
+
+            const Divider(),
+
+            /// 予定
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                children: [
+                  Column(
+                    children: const [
+                      Text("10:00"),
+                      Text("11:00"),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 50,
+                    child: VerticalDivider(
+                      width: 30,
+                      thickness: 5,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      "タイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトル",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                children: [
+                  Column(
+                    children: const [
+                      Text("10:00"),
+                      Text("11:00"),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 50,
+                    child: VerticalDivider(
+                      width: 30,
+                      thickness: 5,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      "タイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトルタイトル",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
