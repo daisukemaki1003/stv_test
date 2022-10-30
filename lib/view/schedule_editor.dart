@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stv_test/constraints/color.dart';
 
@@ -32,7 +33,7 @@ class ScheduleEditor extends StatelessWidget {
               /// 削除ボタン
               Padding(
                 padding: const EdgeInsets.only(top: 30),
-                child: deleteButton(),
+                child: deleteButton(context),
               )
             ],
           ),
@@ -41,7 +42,7 @@ class ScheduleEditor extends StatelessWidget {
     );
   }
 
-  Widget deleteButton() {
+  Widget deleteButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
@@ -49,11 +50,66 @@ class ScheduleEditor extends StatelessWidget {
           backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 20),
         ),
-        onPressed: () {},
         child: const Text(
           'この予定を削除',
           style: TextStyle(color: Colors.red),
         ),
+        onPressed: () {
+          _showAlertDialog(context);
+        },
+      ),
+    );
+  }
+
+  void discardEditsDialog(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("編集を破棄"),
+            )
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            child: Text("キャンセル"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAlertDialog(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('予定の削除'),
+        content: const Text('本当にこの日の予定を削除しますか？'),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            textStyle: const TextStyle(color: Colors.blue),
+            child: const Text('キャンセル'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            textStyle: const TextStyle(color: Colors.blue),
+            child: const Text('削除'),
+          )
+        ],
       ),
     );
   }
