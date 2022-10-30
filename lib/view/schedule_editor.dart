@@ -9,7 +9,27 @@ class ScheduleEditor extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: defaultColor,
-      appBar: AppBar(title: const Text("予定の追加")),
+      appBar: AppBar(
+        title: const Text("予定の追加"),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            child: TextButton(
+              onPressed: () {},
+              child: Text("保存"),
+              style: TextButton.styleFrom(
+                backgroundColor: defaultColor,
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -76,7 +96,7 @@ class ScheduleEditor extends StatelessWidget {
             )
           ],
           cancelButton: CupertinoActionSheetAction(
-            child: Text("キャンセル"),
+            child: const Text("キャンセル"),
             onPressed: () {
               Navigator.pop(context);
             },
