@@ -6,3 +6,4 @@ const sundayTextColor = Colors.red;
 
 /// 週ヘッダー内のバックグラウンドカラー
 const weekHeaderColor = Color.fromARGB(255, 237, 237, 237);
+const defaultColor = Color.fromARGB(255, 237, 237, 237);
