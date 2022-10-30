@@ -14,4 +14,8 @@ class Schedule {
     required this.isAllDay,
     required this.comment,
   });
+
+  toJson() {}
+  copy({int? id}) {}
+  static fromJson(Map json) {}
 }
