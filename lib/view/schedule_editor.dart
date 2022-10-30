@@ -19,13 +19,13 @@ class ScheduleEditor extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: TextButton(
               onPressed: () {},
-              child: Text("保存"),
               style: TextButton.styleFrom(
                 backgroundColor: defaultColor,
               ),
+              child: const Text("保存"),
             ),
           ),
         ],
@@ -42,7 +42,7 @@ class ScheduleEditor extends StatelessWidget {
               ),
 
               /// 予定日選択
-              scheduledDateSelectionTile(),
+              scheduledDateSelectionTile(context),
 
               /// コメント
               Padding(
@@ -59,6 +59,42 @@ class ScheduleEditor extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void datePicker(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height / 3,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(onPressed: () {}, child: const Text("キャンセル")),
+                    TextButton(onPressed: () {}, child: const Text("完了")),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.dateAndTime,
+                  initialDateTime: DateTime.now().add(
+                    Duration(minutes: 15 - DateTime.now().minute % 15),
+                  ),
+                  minuteInterval: 15,
+                  use24hFormat: true,
+                  onDateTimeChanged: (DateTime newDateTime) {},
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -154,7 +190,7 @@ class ScheduleEditor extends StatelessWidget {
     );
   }
 
-  Widget scheduledDateSelectionTile() {
+  Widget scheduledDateSelectionTile(BuildContext context) {
     return Container(
       color: Colors.white,
       child: Column(
@@ -167,14 +203,18 @@ class ScheduleEditor extends StatelessWidget {
           ListTile(
             title: const Text("終日"),
             trailing: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                datePicker(context);
+              },
               child: const Text("2018-08-03 10:00"),
             ),
           ),
           ListTile(
             title: const Text("終了"),
             trailing: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                datePicker(context);
+              },
               child: const Text("2018-08-03 10:00"),
             ),
           ),
