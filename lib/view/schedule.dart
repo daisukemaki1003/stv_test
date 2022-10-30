@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stv_test/view/schedule_edit.dart';
 
 class SchedulePage extends StatelessWidget {
   const SchedulePage({super.key});
@@ -12,19 +13,19 @@ class SchedulePage extends StatelessWidget {
       child: PageView(
         controller: PageController(viewportFraction: 0.9),
         children: [
-          scheduleCard(),
-          scheduleCard(),
-          unscheduledCard(),
-          scheduleCard(),
-          scheduleCard(),
-          scheduleCard(),
-          scheduleCard(),
+          scheduleCard(context),
+          scheduleCard(context),
+          scheduleCard(context),
+          scheduleCard(context),
+          scheduleCard(context),
+          scheduleCard(context),
+          scheduleCard(context),
         ],
       ),
     );
   }
 
-  scheduleCard() {
+  scheduleCard(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Card(
@@ -44,8 +45,10 @@ class SchedulePage extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                   ),
                   IconButton(
-                    onPressed: () {},
                     icon: const Icon(Icons.add),
+                    onPressed: () {
+                      Navigator.pushNamed(context, ScheduleEditPage.routeName);
+                    },
                   ),
                 ],
               ),

@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stv_test/constraints/color.dart';
 
-class ScheduleEditor extends StatelessWidget {
-  const ScheduleEditor({super.key});
+class ScheduleEditPage extends StatelessWidget {
+  static const String routeName = '/schedule-edit-page';
+
+  const ScheduleEditPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class ScheduleEditor extends StatelessWidget {
     );
   }
 
-  void datePicker(BuildContext context) async {
+  void datePicker(BuildContext context, bool allDay) async {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -82,7 +84,9 @@ class ScheduleEditor extends StatelessWidget {
               ),
               Expanded(
                 child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.dateAndTime,
+                  mode: allDay
+                      ? CupertinoDatePickerMode.date
+                      : CupertinoDatePickerMode.dateAndTime,
                   initialDateTime: DateTime.now().add(
                     Duration(minutes: 15 - DateTime.now().minute % 15),
                   ),
@@ -204,7 +208,7 @@ class ScheduleEditor extends StatelessWidget {
             title: const Text("終日"),
             trailing: TextButton(
               onPressed: () {
-                datePicker(context);
+                datePicker(context, true);
               },
               child: const Text("2018-08-03 10:00"),
             ),
@@ -213,7 +217,7 @@ class ScheduleEditor extends StatelessWidget {
             title: const Text("終了"),
             trailing: TextButton(
               onPressed: () {
-                datePicker(context);
+                datePicker(context, false);
               },
               child: const Text("2018-08-03 10:00"),
             ),

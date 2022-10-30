@@ -4,6 +4,7 @@ import 'package:stv_test/constraints/font.dart';
 import 'package:stv_test/view/schedule.dart';
 
 class CalendarPage extends StatelessWidget {
+  static const String routeName = '/calendar-page';
   const CalendarPage({super.key});
 
   @override
