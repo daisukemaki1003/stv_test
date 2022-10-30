@@ -1,21 +1,19 @@
-class Schedule {
-  final int id;
-  final String name;
-  final DateTime from;
-  final DateTime to;
-  final bool isAllDay;
-  final String comment;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  Schedule({
-    required this.id,
-    required this.name,
-    required this.from,
-    required this.to,
-    required this.isAllDay,
-    required this.comment,
-  });
+part 'schedule.freezed.dart';
+part 'schedule.g.dart';
 
-  toJson() {}
-  copy({int? id}) {}
-  static fromJson(Map json) {}
+@freezed
+class Schedule with _$Schedule {
+  const factory Schedule({
+    required int id,
+    required String name,
+    required DateTime from,
+    required DateTime to,
+    required bool isAllDay,
+    required String comment,
+  }) = _Schedule;
+
+  factory Schedule.fromJson(Map<String, dynamic> json) =>
+      _$ScheduleFromJson(json);
 }

@@ -66,7 +66,7 @@ CREATE TABLE $scheduleTables (
     final db = await instance.database;
 
     final id = await db.insert(scheduleTables, schedule.toJson());
-    return schedule.copy(id: id);
+    return schedule.copyWith(id: id);
   }
 
   Future<Schedule> readDiary(int id) async {
