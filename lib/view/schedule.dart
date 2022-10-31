@@ -47,7 +47,7 @@ class SchedulePage extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () {
-                      Navigator.pushNamed(context, ScheduleEditPage.routeName);
+                      // Navigator.pushNamed(context, ScheduleEditPage.routeName);
                     },
                   ),
                 ],

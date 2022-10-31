@@ -4,6 +4,6 @@ import 'package:stv_test/data_source/schedule.dart';
 ///
 /// DI
 
-final scheduleDataSourceProvider = Provider((_) {
-  return ScheduleDataSourceImpl.instance;
+final scheduleDataSourceProvider = Provider<ScheduleDataSource>((_) {
+  return ScheduleDataSourceImpl();
 });

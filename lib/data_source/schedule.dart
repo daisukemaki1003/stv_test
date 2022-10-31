@@ -1,148 +1,56 @@
-// ignore_for_file: depend_on_referenced_packages
+import 'dart:io';
 
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:stv_test/model/schedule.dart';
 
-/// 基本情報
-const String scheduleTables = 'schedules';
+part 'schedule.g.dart';
 
-class ScheduleFields {
-  static final List<String> values = [
-    id,
-    name,
-    from,
-    to,
-    isAllDay,
-    comment,
-  ];
+LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
 
-  static const String id = "_id";
-  static const String name = "_name";
-  static const String from = "_from";
-  static const String to = "_to";
-  static const String isAllDay = "_isAllDay";
-  static const String comment = "_comment";
+    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    return NativeDatabase(file);
+  });
 }
 
 /// インターフェース
 abstract class ScheduleDataSource {
-  Future<Database> get database;
-  // Future<Database> _init(String filePath);
-  Future<Schedule> create(Schedule schedule);
-  Future<Schedule> fetchById(int id);
-  Future<List<Schedule>> fetchByDate(DateTime date);
-  Future<int> update(Schedule schedule);
-  Future<int> delete(int id);
-  Future close();
+  Future<int> createSchedule(ScheduleCompanion schedule);
+  Future<bool> updateSchedule(ScheduleData schedule);
+  Future<int> deleteSchedule(int id);
+  Future<List<ScheduleData>> fetchAll();
 }
 
 /// 実装
-class ScheduleDataSourceImpl implements ScheduleDataSource {
-  static final ScheduleDataSourceImpl instance = ScheduleDataSourceImpl._init();
-
-  static Database? _database;
-
-  ScheduleDataSourceImpl._init();
+@DriftDatabase(tables: [Schedule])
+class ScheduleDataSourceImpl extends _$ScheduleDataSourceImpl
+    implements ScheduleDataSource {
+  ScheduleDataSourceImpl() : super(_openConnection());
 
   @override
-  Future<Database> get database async {
-    if (_database != null) return _database!;
+  int get schemaVersion => 1;
 
-    _database = await _init('diaries.db');
-    return _database!;
-  }
-
-  Future<Database> _init(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-
-    return await openDatabase(path, version: 1, onCreate: _createDB);
-  }
-
-  Future _createDB(Database db, int version) async {
-    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    const textType = 'TEXT NOT NULL';
-    const boolType = 'BOOLEAN NOT NULL';
-
-    await db.execute('''
-CREATE TABLE $scheduleTables ( 
-  ${ScheduleFields.id} $idType, 
-  ${ScheduleFields.name} $textType,
-  ${ScheduleFields.from} $textType,
-  ${ScheduleFields.to} $textType,
-  ${ScheduleFields.isAllDay} $boolType
-  ${ScheduleFields.comment} $textType
-  )
-''');
+  @override
+  Future<int> createSchedule(ScheduleCompanion newSchedule) async {
+    return into(schedule).insert(newSchedule);
   }
 
   @override
-  Future<Schedule> create(Schedule schedule) async {
-    final db = await instance.database;
-
-    final id = await db.insert(scheduleTables, schedule.toJson());
-    return schedule.copyWith(id: id);
+  Future<bool> updateSchedule(ScheduleData newSchedule) async {
+    return update(schedule).replace(newSchedule);
   }
 
   @override
-  Future<Schedule> fetchById(int id) async {
-    final db = await instance.database;
-
-    final maps = await db.query(
-      scheduleTables,
-      columns: ScheduleFields.values,
-      where: '${ScheduleFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Schedule.fromJson(maps.first);
-    } else {
-      throw Exception('ID $id not found');
-    }
+  Future<int> deleteSchedule(int id) async {
+    return (delete(schedule)..where((it) => it.id.equals(id))).go();
   }
 
   @override
-  Future<List<Schedule>> fetchByDate(DateTime date) async {
-    return [
-      Schedule(
-        id: null,
-        name: "test",
-        from: DateTime.now(),
-        to: DateTime.now(),
-        isAllDay: false,
-        comment: "comment",
-      ),
-    ];
-  }
-
-  @override
-  Future<int> update(Schedule schedule) async {
-    final db = await instance.database;
-
-    return db.update(
-      scheduleTables,
-      schedule.toJson(),
-      where: '${ScheduleFields.id} = ?',
-      whereArgs: [schedule.id],
-    );
-  }
-
-  @override
-  Future<int> delete(int id) async {
-    final db = await instance.database;
-
-    return await db.delete(
-      scheduleTables,
-      where: '${ScheduleFields.id} = ?',
-      whereArgs: [id],
-    );
-  }
-
-  @override
-  Future close() async {
-    final db = await instance.database;
-    db.close();
+  Future<List<ScheduleData>> fetchAll() async {
+    return select(schedule).get();
   }
 }

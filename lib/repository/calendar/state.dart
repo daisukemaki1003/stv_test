@@ -27,9 +27,7 @@ class CalendarNotifier extends StateNotifier<AsyncValue<List<Calendar>>> {
 
   fetchBySelectedMonth() async {
     final calendarList = ref.watch(calendarListProvider);
-    for (var calendar in calendarList) {
-      calendar.schedules.addAll(await _dataSource.fetchByDate(calendar.date));
-    }
+
     state = AsyncValue.data(calendarList);
   }
 }

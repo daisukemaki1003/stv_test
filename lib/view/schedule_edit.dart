@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:stv_test/constraints/color.dart';
 
 class ScheduleEditPage extends StatelessWidget {
-  static const String routeName = '/schedule-edit-page';
-
   const ScheduleEditPage({super.key});
 
   @override

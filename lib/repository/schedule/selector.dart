@@ -1,23 +1,44 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stv_test/model/schedule.dart';
+import 'package:stv_test/data_source/schedule.dart';
 
-/// 新規作成
-final scheduleNameProvider = StateProvider<String>((ref) => "");
+/// スケジュールデータ
+final scheduleIdProvider = StateProvider<int?>((ref) => null);
+final scheduleTitleProvider = StateProvider<String>((ref) => "");
 final scheduleFromProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final scheduleToProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final scheduleIsAllDayProvider = StateProvider<bool>((ref) => false);
 final scheduleCommentProvider = StateProvider<String>((ref) => "");
 
-final newScheduleProvider = StateProvider<Schedule>((ref) {
-  final name = ref.watch(scheduleNameProvider);
+/// 新規作成
+final newScheduleProvider = StateProvider<ScheduleCompanion>((ref) {
+  final title = ref.watch(scheduleTitleProvider);
   final from = ref.watch(scheduleFromProvider);
   final to = ref.watch(scheduleToProvider);
   final isAllDay = ref.watch(scheduleIsAllDayProvider);
   final comment = ref.watch(scheduleCommentProvider);
 
-  return Schedule(
-    id: null,
-    name: name,
+  return ScheduleCompanion(
+    title: Value(title),
+    from: Value(from),
+    to: Value(to),
+    isAllDay: Value(isAllDay),
+    comment: Value(comment),
+  );
+});
+
+/// 編集
+final editScheduleProvider = StateProvider<ScheduleData>((ref) {
+  final id = ref.watch(scheduleIdProvider);
+  final title = ref.watch(scheduleTitleProvider);
+  final from = ref.watch(scheduleFromProvider);
+  final to = ref.watch(scheduleToProvider);
+  final isAllDay = ref.watch(scheduleIsAllDayProvider);
+  final comment = ref.watch(scheduleCommentProvider);
+
+  return ScheduleData(
+    id: id!,
+    title: title,
     from: from,
     to: to,
     isAllDay: isAllDay,

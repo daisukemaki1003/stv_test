@@ -15,7 +15,7 @@ class CalendarCellListContainer extends ConsumerWidget {
     final calendarList = ref.watch(calendarNotifierProvider);
 
     return calendarList.map(
-        error: (_) => const Text('On Error'),
+        error: (_) => const Center(child: Text('On Error')),
         loading: (_) => const CircularProgressIndicator(),
         data: (data) {
           /// 週ごとのデータに加工
@@ -110,7 +110,7 @@ class CalendarCellListContainer extends ConsumerWidget {
             ),
 
             /// 予定が存在する
-            if (calendar.schedules.isNotEmpty)
+            if (false)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(

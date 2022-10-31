@@ -1,19 +1,29 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+// class Schedule {
+//   final int? id;
+//   final String name;
+//   final DateTime from;
+//   final DateTime to;
+//   final bool isAllDay;
+//   final String comment;
 
-part 'schedule.freezed.dart';
-part 'schedule.g.dart';
+//   Schedule({
+//     required this.id,
+//     required this.name,
+//     required this.from,
+//     required this.to,
+//     required this.isAllDay,
+//     required this.comment,
+//   });
+// }
 
-@freezed
-class Schedule with _$Schedule {
-  const factory Schedule({
-    required int? id,
-    required String name,
-    required DateTime from,
-    required DateTime to,
-    required bool isAllDay,
-    required String comment,
-  }) = _Schedule;
+import 'package:drift/drift.dart';
 
-  factory Schedule.fromJson(Map<String, dynamic> json) =>
-      _$ScheduleFromJson(json);
+class Schedule extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text().named('title')();
+  TextColumn get comment => text().named('comment')();
+  DateTimeColumn get from => dateTime().named('from')();
+  DateTimeColumn get to => dateTime().named('to')();
+  BoolColumn get isAllDay =>
+      boolean().withDefault(const Constant(false)).named('is_all_day')();
 }

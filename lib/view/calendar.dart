@@ -5,7 +5,6 @@ import 'package:stv_test/constraints/font.dart';
 import 'package:stv_test/view/calender_cell_list.dart';
 
 class CalendarPage extends ConsumerWidget {
-  static const String routeName = '/calendar-page';
   const CalendarPage({super.key});
 
   @override
