@@ -7,7 +7,7 @@ part of 'schedule.dart';
 // **************************************************************************
 
 _$_Schedule _$$_ScheduleFromJson(Map<String, dynamic> json) => _$_Schedule(
-      id: json['id'] as int,
+      id: json['id'] as int?,
       name: json['name'] as String,
       from: DateTime.parse(json['from'] as String),
       to: DateTime.parse(json['to'] as String),

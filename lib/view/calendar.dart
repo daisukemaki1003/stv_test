@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
+import 'package:stv_test/repository/schedule/state.dart';
+
 import 'package:stv_test/view/schedule.dart';
 
-class CalendarPage extends StatelessWidget {
+class CalendarPage extends ConsumerWidget {
   static const String routeName = '/calendar-page';
   const CalendarPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    /// 週ヘッダー内のテキストスタイル
-    const defaultWeekHeaderTextStyle = TextStyle(fontSize: defaltFontSize);
-    const saturdayWeekHeaderTextStyle =
-        TextStyle(fontSize: defaltFontSize, color: saturdayTextColor);
-    const sundayWeekHeaderTextStyle =
-        TextStyle(fontSize: defaltFontSize, color: sundayTextColor);
+  Widget build(BuildContext context, WidgetRef ref) {
+    /// State
+    final scheduleNotifier = ref.watch(scheduleNotifierProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,12 +34,7 @@ class CalendarPage extends StatelessWidget {
           ),
 
           /// 週ヘッダー
-          weekHeader(
-            weekHeaderColor,
-            defaultWeekHeaderTextStyle,
-            saturdayWeekHeaderTextStyle,
-            sundayWeekHeaderTextStyle,
-          ),
+          weekHeader(),
 
           weekRow(context),
           weekRow(context),
@@ -144,16 +138,18 @@ class CalendarPage extends StatelessWidget {
     );
   }
 
-  Widget weekHeader(
-      Color weekHeaderColor,
-      TextStyle defaultWeekHeaderTextStyle,
-      TextStyle saturdayWeekHeaderTextStyle,
-      TextStyle sundayWeekHeaderTextStyle) {
+  Widget weekHeader() {
+    const defaultWeekHeaderTextStyle = TextStyle(fontSize: defaltFontSize);
+    const saturdayWeekHeaderTextStyle =
+        TextStyle(fontSize: defaltFontSize, color: saturdayTextColor);
+    const sundayWeekHeaderTextStyle =
+        TextStyle(fontSize: defaltFontSize, color: sundayTextColor);
+
     return Container(
       color: weekHeaderColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
+        children: const [
           Text("月", style: defaultWeekHeaderTextStyle),
           Text("火", style: defaultWeekHeaderTextStyle),
           Text("水", style: defaultWeekHeaderTextStyle),

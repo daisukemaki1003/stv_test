@@ -2,7 +2,6 @@
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
 import 'package:stv_test/model/schedule.dart';
 
 /// 基本情報
@@ -31,8 +30,8 @@ abstract class ScheduleDataSource {
   Future<Database> get database;
   // Future<Database> _init(String filePath);
   Future<Schedule> create(Schedule schedule);
-  Future<Schedule> readById(int id);
-  Future<List<Schedule>> readByMonth(DateTime date);
+  Future<Schedule> fetchById(int id);
+  Future<List<Schedule>> fetchByMonth(DateTime date);
   Future<int> update(Schedule schedule);
   Future<int> delete(int id);
   Future close();
@@ -87,7 +86,7 @@ CREATE TABLE $scheduleTables (
   }
 
   @override
-  Future<Schedule> readById(int id) async {
+  Future<Schedule> fetchById(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -105,9 +104,17 @@ CREATE TABLE $scheduleTables (
   }
 
   @override
-  Future<List<Schedule>> readByMonth(DateTime date) {
-    // TODO: implement readByMonth
-    throw UnimplementedError();
+  Future<List<Schedule>> fetchByMonth(DateTime date) async {
+    return [
+      Schedule(
+        id: null,
+        name: "test",
+        from: DateTime.now(),
+        to: DateTime.now(),
+        isAllDay: false,
+        comment: "comment",
+      ),
+    ];
   }
 
   @override

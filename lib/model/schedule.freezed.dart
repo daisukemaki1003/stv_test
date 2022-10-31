@@ -20,7 +20,7 @@ Schedule _$ScheduleFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Schedule {
-  int get id => throw _privateConstructorUsedError;
+  int? get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   DateTime get from => throw _privateConstructorUsedError;
   DateTime get to => throw _privateConstructorUsedError;
@@ -39,7 +39,7 @@ abstract class $ScheduleCopyWith<$Res> {
       _$ScheduleCopyWithImpl<$Res, Schedule>;
   @useResult
   $Res call(
-      {int id,
+      {int? id,
       String name,
       DateTime from,
       DateTime to,
@@ -60,7 +60,7 @@ class _$ScheduleCopyWithImpl<$Res, $Val extends Schedule>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? id = freezed,
     Object? name = null,
     Object? from = null,
     Object? to = null,
@@ -68,10 +68,10 @@ class _$ScheduleCopyWithImpl<$Res, $Val extends Schedule>
     Object? comment = null,
   }) {
     return _then(_value.copyWith(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -104,7 +104,7 @@ abstract class _$$_ScheduleCopyWith<$Res> implements $ScheduleCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {int? id,
       String name,
       DateTime from,
       DateTime to,
@@ -123,7 +123,7 @@ class __$$_ScheduleCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? id = freezed,
     Object? name = null,
     Object? from = null,
     Object? to = null,
@@ -131,10 +131,10 @@ class __$$_ScheduleCopyWithImpl<$Res>
     Object? comment = null,
   }) {
     return _then(_$_Schedule(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -174,7 +174,7 @@ class _$_Schedule implements _Schedule {
       _$$_ScheduleFromJson(json);
 
   @override
-  final int id;
+  final int? id;
   @override
   final String name;
   @override
@@ -226,7 +226,7 @@ class _$_Schedule implements _Schedule {
 
 abstract class _Schedule implements Schedule {
   const factory _Schedule(
-      {required final int id,
+      {required final int? id,
       required final String name,
       required final DateTime from,
       required final DateTime to,
@@ -236,7 +236,7 @@ abstract class _Schedule implements Schedule {
   factory _Schedule.fromJson(Map<String, dynamic> json) = _$_Schedule.fromJson;
 
   @override
-  int get id;
+  int? get id;
   @override
   String get name;
   @override

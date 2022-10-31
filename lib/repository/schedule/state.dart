@@ -1,39 +1,44 @@
+import 'package:stv_test/data_source/schedule.dart';
 import 'package:stv_test/model/schedule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stv_test/repository/module.dart';
-import 'package:stv_test/repository/schedule.dart';
+import 'package:stv_test/data_source/module.dart';
+import 'package:stv_test/repository/schedule/selector.dart';
 
+/// プロバイダー
 final scheduleNotifierProvider =
     StateNotifierProvider<ScheduleNotifier, AsyncValue<List<Schedule>>>((ref) {
-  return ScheduleNotifier(ref, ref.watch(scheduleRepositoryProvider))
-    ..initialize();
+  return ScheduleNotifier(
+    ref,
+    ref.watch(scheduleDataSourceProvider),
+  )..initialize();
 });
 
+/// ステート
 class ScheduleNotifier extends StateNotifier<AsyncValue<List<Schedule>>> {
-  ScheduleNotifier(this.ref, this._repository)
+  ScheduleNotifier(this.ref, this._dataSource)
       : super(const AsyncValue<List<Schedule>>.loading());
 
   final Ref ref;
-  final ScheduleRepository _repository;
+  final ScheduleDataSource _dataSource;
 
   Future<void> initialize() async {
     await fetchByMonth(DateTime.now());
   }
 
   create() async {
-    // final diary = ref.watch(diaryProvider);
-    // await presenter.create(diary);
+    final newSchedule = ref.watch(newScheduleProvider);
+    await _dataSource.create(newSchedule);
     // ref.refresh(diariesNotifierProvider);
   }
 
   update() async {
-    // final diary = ref.watch(diaryProvider);
-    // await presenter.update(diary);
+    final newSchedule = ref.watch(newScheduleProvider);
+    await _dataSource.update(newSchedule);
     // ref.refresh(diariesNotifierProvider);
   }
 
   fetchByMonth(DateTime today) async {
-    final schedules = await _repository.fetchByMonth(today);
+    final schedules = await _dataSource.fetchByMonth(today);
     state = AsyncValue.data(schedules);
   }
 }
