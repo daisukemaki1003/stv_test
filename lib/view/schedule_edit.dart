@@ -1,21 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:stv_test/constraints/color.dart';
+import 'package:stv_test/routing/named_route.dart';
 
-class ScheduleEditPage extends StatelessWidget {
+class ScheduleEditPage extends ConsumerWidget {
   const ScheduleEditPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: defaultColor,
       appBar: AppBar(
         title: const Text("予定の追加"),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => context.go(calendarPath),
         ),
         actions: [
           Padding(
