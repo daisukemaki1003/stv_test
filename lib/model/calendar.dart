@@ -1,10 +1,10 @@
 class Calendar {
   final DateTime date;
-  final bool isSchedule;
+  final bool enabled;
 
   Calendar({
     required this.date,
-    required this.isSchedule,
+    required this.enabled,
   });
 
   bool isToday() => date == DateTime.now();

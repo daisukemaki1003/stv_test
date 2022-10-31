@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
+import 'package:stv_test/model/calendar.dart';
+import 'package:stv_test/repository/calendar/selector.dart';
 import 'package:stv_test/repository/schedule/state.dart';
 
 import 'package:stv_test/view/schedule.dart';
@@ -13,6 +15,7 @@ class CalendarPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     /// State
+    final calendarList = ref.watch(calendarListProvider);
     final scheduleNotifier = ref.watch(scheduleNotifierProvider);
 
     return Scaffold(
@@ -36,49 +39,53 @@ class CalendarPage extends ConsumerWidget {
           /// 週ヘッダー
           weekHeader(),
 
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
+          /// カレンダーセル
+          Column(
+            children: calendarList.map((e) {
+              return weekRow(context, e);
+            }).toList(),
+          ),
         ],
       ),
     );
   }
 
-  Widget weekRow(BuildContext context) {
+  Widget weekRow(BuildContext context, List<Calendar> calendarList) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, true, false, context),
-          _dateCell(true, true, false, true, context),
-        ],
+        children: calendarList.map((calendarListItem) {
+          return _dateCell(
+            context: context,
+            pran: false,
+            calendar: calendarListItem,
+          );
+        }).toList(),
       ),
     );
   }
 
-  Widget _dateCell(
-    bool pran,
-    bool today,
-    bool saturday,
-    bool sunday,
-    BuildContext context,
-  ) {
-    final Color textColor;
-    if (saturday) {
-      textColor = saturdayTextColor;
-    } else if (sunday) {
-      textColor = sundayTextColor;
+  Widget _dateCell({
+    required bool pran,
+    required BuildContext context,
+    required Calendar calendar,
+  }) {
+    /// 今日かどうか
+    final isToday = calendar.date == DateTime.now();
+
+    /// 曜日に応じたテキストカラー
+    final Color calendarCellTextColor;
+    if (!calendar.enabled) {
+      calendarCellTextColor = Colors.black12;
+    } else if (isToday) {
+      calendarCellTextColor = Colors.white;
+    } else if (calendar.date.weekday == DateTime.saturday) {
+      calendarCellTextColor = saturdayTextColor;
+    } else if (calendar.date.weekday == DateTime.sunday) {
+      calendarCellTextColor = sundayTextColor;
     } else {
-      textColor = defaltTextColor;
+      calendarCellTextColor = defaltTextColor;
     }
 
     return InkWell(
@@ -102,7 +109,7 @@ class CalendarPage extends ConsumerWidget {
           fit: StackFit.loose,
           children: [
             Container(
-              decoration: today
+              decoration: isToday
                   ? const BoxDecoration(
                       color: Colors.blue,
                       shape: BoxShape.circle,
@@ -110,11 +117,8 @@ class CalendarPage extends ConsumerWidget {
                   : null,
               child: Center(
                 child: Text(
-                  "12",
-                  style: TextStyle(
-                    color: today ? Colors.white : textColor,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  calendar.date.day.toString(),
+                  style: TextStyle(color: calendarCellTextColor),
                 ),
               ),
             ),
