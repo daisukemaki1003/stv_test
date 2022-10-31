@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
+import 'package:stv_test/repository/calendar/selector.dart';
 import 'package:stv_test/view/calender_cell_list.dart';
 
 class CalendarPage extends ConsumerWidget {
@@ -9,7 +10,8 @@ class CalendarPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    /// State
+    final targetYear = ref.watch(targetYearProvider);
+    final targetMonth = ref.watch(targetMonthProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -23,7 +25,7 @@ class CalendarPage extends ConsumerWidget {
               todayButton(),
 
               /// 月選択ピッカー
-              monthPicker(),
+              monthPicker(targetYear, targetMonth),
 
               Container(),
             ],
@@ -63,12 +65,12 @@ class CalendarPage extends ConsumerWidget {
     );
   }
 
-  Widget monthPicker() {
+  Widget monthPicker(int year, int month) {
     return Row(
       children: [
-        const Text(
-          "2021年8月",
-          style: TextStyle(
+        Text(
+          "$year年$month月",
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),

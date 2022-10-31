@@ -1,5 +1,3 @@
-import 'package:stv_test/model/schedule.dart';
-
 class Calendar {
   final DateTime date;
   final bool enabled;

@@ -51,7 +51,8 @@ class CalendarCellListContainer extends ConsumerWidget {
     required Calendar calendar,
   }) {
     /// 今日かどうか
-    final isToday = calendar.date == DateTime.now();
+    final isToday = calendar.date.difference(DateTime.now()).inDays == 0 &&
+        calendar.date.day == DateTime.now().day;
 
     /// 曜日に応じたテキストカラー
     final Color calendarCellTextColor;
