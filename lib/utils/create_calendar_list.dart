@@ -12,6 +12,7 @@ List<Calendar> prevPaddingDays(int year, int month) {
       Calendar(
         date: DateTime(year, month, day),
         enabled: false,
+        schedules: [],
       ),
     );
   }
@@ -26,6 +27,7 @@ List<Calendar> currentDays(int year, int month) {
     calendarList.add(Calendar(
       date: DateTime(year, month, day),
       enabled: true,
+      schedules: [],
     ));
   }
   return calendarList;
@@ -38,12 +40,13 @@ List<Calendar> nextPaddingDays(int year, int month, prevList, currentList) {
     list.add(Calendar(
       date: DateTime(year, month, day),
       enabled: false,
+      schedules: [],
     ));
   }
   return list;
 }
 
-List<List<Calendar>> createCalendarList(int targetYear, int targetMonth) {
+List<Calendar> createCalendarList(int targetYear, int targetMonth) {
   final prevList = prevPaddingDays(targetYear, targetMonth);
   final currentList = currentDays(targetYear, targetMonth);
   final nextList =
@@ -54,16 +57,13 @@ List<List<Calendar>> createCalendarList(int targetYear, int targetMonth) {
     ...nextList,
   ];
 
-  return to2Dim(flatCalendarDate, 7);
+  return flatCalendarDate;
 }
 
 /// ２次元リストを作成する
-List<List<Calendar>> to2Dim(list, numOfElems) {
+List<List<Calendar>> to2Dim(list) {
   if (list.isEmpty) {
     return [];
   }
-  return [
-    list.take(numOfElems).toList(),
-    ...to2Dim(list.skip(numOfElems), numOfElems)
-  ];
+  return [list.take(7).toList(), ...to2Dim(list.skip(7))];
 }

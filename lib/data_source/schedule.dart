@@ -31,7 +31,7 @@ abstract class ScheduleDataSource {
   // Future<Database> _init(String filePath);
   Future<Schedule> create(Schedule schedule);
   Future<Schedule> fetchById(int id);
-  Future<List<Schedule>> fetchByMonth(DateTime date);
+  Future<List<Schedule>> fetchByDate(DateTime date);
   Future<int> update(Schedule schedule);
   Future<int> delete(int id);
   Future close();
@@ -104,7 +104,7 @@ CREATE TABLE $scheduleTables (
   }
 
   @override
-  Future<List<Schedule>> fetchByMonth(DateTime date) async {
+  Future<List<Schedule>> fetchByDate(DateTime date) async {
     return [
       Schedule(
         id: null,

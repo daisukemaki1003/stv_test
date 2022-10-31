@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/model/calendar.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
+import 'package:stv_test/repository/calendar/state.dart';
+import 'package:stv_test/utils/create_calendar_list.dart';
 import 'package:stv_test/view/schedule.dart';
 
 class CalendarCellListContainer extends ConsumerWidget {
@@ -10,14 +11,22 @@ class CalendarCellListContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final calendarList = ref.watch(calendarListProvider);
+    /// 選択中の月のカレンダーリスト
+    final calendarList = ref.watch(calendarNotifierProvider);
 
-    return Column(
-      children: calendarList.map((calendarListItem) {
-        /// 週ごとのカレンダーセルを表示
-        return weekRow(context, calendarListItem);
-      }).toList(),
-    );
+    return calendarList.map(
+        error: (_) => const Text('On Error'),
+        loading: (_) => const CircularProgressIndicator(),
+        data: (data) {
+          /// 週ごとのデータに加工
+          final calendarListweekly = to2Dim(data.value);
+          return Column(
+            children: calendarListweekly.map((calendarListItem) {
+              /// 週ごとのカレンダーセルを表示
+              return weekRow(context, calendarListItem);
+            }).toList(),
+          );
+        });
   }
 
   Widget weekRow(BuildContext context, List<Calendar> calendarList) {
@@ -28,7 +37,6 @@ class CalendarCellListContainer extends ConsumerWidget {
         children: calendarList.map((calendarListItem) {
           return _dateCell(
             context: context,
-            pran: false,
             calendar: calendarListItem,
           );
         }).toList(),
@@ -38,9 +46,6 @@ class CalendarCellListContainer extends ConsumerWidget {
 
   Widget _dateCell({
     required BuildContext context,
-
-    /// 予定が存在するか
-    required bool pran,
 
     /// カレンダーデータ
     required Calendar calendar,
@@ -105,7 +110,7 @@ class CalendarCellListContainer extends ConsumerWidget {
             ),
 
             /// 予定が存在する
-            if (pran)
+            if (calendar.schedules.isNotEmpty)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(

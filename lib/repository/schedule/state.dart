@@ -22,7 +22,7 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<Schedule>>> {
   final ScheduleDataSource _dataSource;
 
   Future<void> initialize() async {
-    await fetchByMonth(DateTime.now());
+    // await fetchByMonth(DateTime.now());
   }
 
   create() async {
@@ -37,8 +37,8 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<Schedule>>> {
     // ref.refresh(diariesNotifierProvider);
   }
 
-  fetchByMonth(DateTime today) async {
-    final schedules = await _dataSource.fetchByMonth(today);
+  fetchByDate(DateTime today) async {
+    final schedules = await _dataSource.fetchByDate(today);
     state = AsyncValue.data(schedules);
   }
 }
