@@ -10,7 +10,7 @@ List<Calendar> prevPaddingDays(int year, int month) {
       day++) {
     calendarList.add(
       Calendar(
-        date: DateTime(year, month, day),
+        date: DateTime(year, month - 1, day),
         enabled: false,
       ),
     );
@@ -36,7 +36,7 @@ List<Calendar> nextPaddingDays(int year, int month, prevList, currentList) {
   final paddingDayCount = (42 - (prevList.length + currentList.length)) % 7;
   for (var day = 1; day < paddingDayCount + 1; day++) {
     list.add(Calendar(
-      date: DateTime(year, month, day),
+      date: DateTime(year, month + 1, day),
       enabled: false,
     ));
   }

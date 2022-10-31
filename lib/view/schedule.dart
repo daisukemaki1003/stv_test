@@ -131,7 +131,7 @@ class SchedulePage extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
-        child: Center(
+        child: const Center(
           child: Text("予定がありません"),
         ),
       ),
