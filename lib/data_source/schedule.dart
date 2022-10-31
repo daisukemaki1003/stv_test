@@ -2,8 +2,10 @@
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
 import 'package:stv_test/model/schedule.dart';
 
+/// 基本情報
 const String scheduleTables = 'schedules';
 
 class ScheduleFields {
@@ -24,21 +26,35 @@ class ScheduleFields {
   static const String comment = "_comment";
 }
 
-class ScheduleDataSource {
-  static final ScheduleDataSource instance = ScheduleDataSource._init();
+/// インターフェース
+abstract class ScheduleDataSource {
+  Future<Database> get database;
+  // Future<Database> _init(String filePath);
+  Future<Schedule> create(Schedule schedule);
+  Future<Schedule> readById(int id);
+  Future<List<Schedule>> readByMonth(DateTime date);
+  Future<int> update(Schedule schedule);
+  Future<int> delete(int id);
+  Future close();
+}
+
+/// 実装
+class ScheduleDataSourceImpl implements ScheduleDataSource {
+  static final ScheduleDataSourceImpl instance = ScheduleDataSourceImpl._init();
 
   static Database? _database;
 
-  ScheduleDataSource._init();
+  ScheduleDataSourceImpl._init();
 
+  @override
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    _database = await _initDB('diaries.db');
+    _database = await _init('diaries.db');
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  Future<Database> _init(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
@@ -62,6 +78,7 @@ CREATE TABLE $scheduleTables (
 ''');
   }
 
+  @override
   Future<Schedule> create(Schedule schedule) async {
     final db = await instance.database;
 
@@ -69,7 +86,8 @@ CREATE TABLE $scheduleTables (
     return schedule.copyWith(id: id);
   }
 
-  Future<Schedule> readDiary(int id) async {
+  @override
+  Future<Schedule> readById(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -86,6 +104,13 @@ CREATE TABLE $scheduleTables (
     }
   }
 
+  @override
+  Future<List<Schedule>> readByMonth(DateTime date) {
+    // TODO: implement readByMonth
+    throw UnimplementedError();
+  }
+
+  @override
   Future<int> update(Schedule schedule) async {
     final db = await instance.database;
 
@@ -97,6 +122,7 @@ CREATE TABLE $scheduleTables (
     );
   }
 
+  @override
   Future<int> delete(int id) async {
     final db = await instance.database;
 
@@ -107,9 +133,9 @@ CREATE TABLE $scheduleTables (
     );
   }
 
+  @override
   Future close() async {
     final db = await instance.database;
-
     db.close();
   }
 }
