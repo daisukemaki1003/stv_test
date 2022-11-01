@@ -56,17 +56,24 @@ class ScheduleEditPage extends ConsumerWidget {
             if (!isEdited.state) context.go(calendarPath);
             final result = await discardEditsDialog(context);
             if (result != null && result) context.go(calendarPath);
+            // scheduleNotifier.clear();
             isEdited.state = false;
           },
         ),
 
         /// 保存ボタン
         actions: [
-          saveButton(save: () {
-            context.go(calendarPath);
-            onCreate ? scheduleNotifier.create() : scheduleNotifier.update();
-            isEdited.state = false;
-          })
+          saveButton(
+            clickable: onCreate
+                ? scheduleTitle.state.isNotEmpty &&
+                    scheduleComment.state.isNotEmpty
+                : isEdited.state,
+            save: () {
+              context.go(calendarPath);
+              onCreate ? scheduleNotifier.create() : scheduleNotifier.update();
+              isEdited.state = false;
+            },
+          )
         ],
       ),
       body: GestureDetector(
@@ -101,7 +108,6 @@ class ScheduleEditPage extends ConsumerWidget {
                       allDaySelectionButton(
                         isAllDay: scheduleIsAllDay.state,
                         onChanged: (value) {
-                          print(value);
                           scheduleIsAllDay.state = value;
                           isEdited.state = true;
                         },
@@ -194,8 +200,8 @@ class ScheduleEditPage extends ConsumerWidget {
           /// 日付選択
           final result = await datePicker(
             context: context,
-            allDay: false,
-            selectedDate: selectedDate,
+            isAllDay: false,
+            date: selectedDate,
           );
 
           /// 選択された日時で上書き
@@ -203,7 +209,10 @@ class ScheduleEditPage extends ConsumerWidget {
         },
 
         /// フォーマットに応じて日付表示
-        child: Text(dateFormat.format(selectedDate)),
+        child: Text(
+          dateFormat.format(selectedDate),
+          style: const TextStyle(color: defaltTextColor),
+        ),
       ),
     );
   }
@@ -229,11 +238,14 @@ class ScheduleEditPage extends ConsumerWidget {
     );
   }
 
-  Widget saveButton({required Function() save}) {
+  Widget saveButton({
+    required bool clickable,
+    required Function() save,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: TextButton(
-        onPressed: save,
+        onPressed: clickable ? save : null,
         style: TextButton.styleFrom(
           backgroundColor: defaultColor,
         ),

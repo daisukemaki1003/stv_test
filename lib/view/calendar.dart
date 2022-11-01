@@ -42,9 +42,8 @@ class CalendarPage extends ConsumerWidget {
                     /// 日付選択
                     final result = await datePicker(
                       context: context,
-                      allDay: true,
-                      selectedDate:
-                          DateTime(targetYear.state, targetMonth.state),
+                      isAllDay: true,
+                      date: DateTime(targetYear.state, targetMonth.state),
                     );
 
                     /// 選択された日時で上書き
@@ -71,24 +70,25 @@ class CalendarPage extends ConsumerWidget {
   }
 
   Widget weekHeader() {
-    const defaultWeekHeaderTextStyle = TextStyle(fontSize: defaltFontSize);
+    const fontSize = 12.0;
+    const defaultWeekHeaderTextStyle = TextStyle(fontSize: fontSize);
     const saturdayWeekHeaderTextStyle =
-        TextStyle(fontSize: defaltFontSize, color: saturdayTextColor);
+        TextStyle(fontSize: fontSize, color: saturdayTextColor);
     const sundayWeekHeaderTextStyle =
-        TextStyle(fontSize: defaltFontSize, color: sundayTextColor);
+        TextStyle(fontSize: fontSize, color: sundayTextColor);
 
     return Container(
       color: weekHeaderColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: const [
-          Text("月", style: defaultWeekHeaderTextStyle),
-          Text("火", style: defaultWeekHeaderTextStyle),
-          Text("水", style: defaultWeekHeaderTextStyle),
-          Text("木", style: defaultWeekHeaderTextStyle),
-          Text("金", style: defaultWeekHeaderTextStyle),
-          Text("土", style: saturdayWeekHeaderTextStyle),
-          Text("日", style: sundayWeekHeaderTextStyle),
+          Text(mon, style: defaultWeekHeaderTextStyle),
+          Text(tue, style: defaultWeekHeaderTextStyle),
+          Text(wed, style: defaultWeekHeaderTextStyle),
+          Text(thu, style: defaultWeekHeaderTextStyle),
+          Text(fri, style: defaultWeekHeaderTextStyle),
+          Text(sat, style: saturdayWeekHeaderTextStyle),
+          Text(sun, style: sundayWeekHeaderTextStyle),
         ],
       ),
     );
