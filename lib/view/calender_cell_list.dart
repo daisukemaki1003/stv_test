@@ -24,12 +24,12 @@ class CalendarCellListContainer extends ConsumerWidget {
     /// スケジュールリスト
     final scheduleNotifier = ref.watch(scheduleNotifierProvider);
 
-    return scheduleNotifier.map(
-      error: (_) => const Center(child: Text('On Error')),
-      loading: (_) => const CircularProgressIndicator(),
+    return scheduleNotifier.when(
+      error: (error, stacktrace) => Text(error.toString()),
+      loading: CircularProgressIndicator.new,
       data: (data) {
         /// スケジュールセット
-        calendarNotifier.setSchedule(data.value);
+        calendarNotifier.setSchedule(data);
 
         /// 週ごとのデータに加工
         final calendarListweekly = to2Dim(calendar);

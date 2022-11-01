@@ -26,24 +26,25 @@ class SchedulePage extends ConsumerWidget {
     final targetNewScheduleDate =
         ref.watch(targetNewScheduleDateProvider.state);
 
+    /// PageViewのインデックス
+    final pageIndex = ref.watch(pageIndexProvider.state);
+
     /// 表示するページ
     final pages = [
       scheduleCard(
-          context: context,
-          cell: targetCell.state,
-          create: (date) {
-            targetSchedule.state = null;
-            targetNewScheduleDate.state = date;
-            context.push(scheduleEditPath);
-          },
-          edit: (schedule) {
-            targetSchedule.state = schedule;
-            context.push(scheduleEditPath);
-          })
+        context: context,
+        cell: targetCell.state,
+        create: (date) {
+          targetSchedule.state = null;
+          targetNewScheduleDate.state = date;
+          context.push(createSchedulePath);
+        },
+        edit: (schedule) {
+          targetSchedule.state = schedule;
+          context.push(editSchedulePath);
+        },
+      )
     ];
-
-    /// PageViewのインデックス
-    final pageIndex = ref.watch(pageIndexProvider.state);
 
     return Container(
       height: 600,
@@ -114,6 +115,8 @@ class SchedulePage extends ConsumerWidget {
               ),
             ),
 
+            const Divider(),
+
             /// 予定がない
             if (cell.schedules.isEmpty) unscheduledCard(),
 
@@ -157,7 +160,6 @@ class SchedulePage extends ConsumerWidget {
 
     return Column(
       children: [
-        const Divider(),
         InkWell(
           onTap: () => onTap(schedule),
           child: Padding(
@@ -195,13 +197,13 @@ class SchedulePage extends ConsumerWidget {
             ),
           ),
         ),
+        const Divider(),
       ],
     );
   }
 
   unscheduledCard() {
-    return const Padding(
-      padding: EdgeInsets.all(5.0),
+    return const Expanded(
       child: Center(
         child: Text("予定がありません"),
       ),

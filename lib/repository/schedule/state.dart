@@ -1,6 +1,8 @@
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/module.dart';
+import 'package:stv_test/repository/calendar/selector.dart';
+import 'package:stv_test/repository/calendar/state.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 
 /// プロバイダー
@@ -26,11 +28,19 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
   create() async {
     final newSchedule = ref.watch(newScheduleProvider);
     await _dataSource.createSchedule(newSchedule);
+    ref.refresh(scheduleNotifierProvider);
   }
 
   update() async {
     final newSchedule = ref.watch(editScheduleProvider);
     await _dataSource.updateSchedule(newSchedule);
+  }
+
+  delete() async {
+    final target = ref.watch(targetScheduleProvider);
+    await _dataSource.deleteSchedule(target!.id);
+    ref.refresh(scheduleNotifierProvider);
+    ref.refresh(calendarNotifierProvider);
   }
 
   fetchAll() async {
@@ -39,8 +49,13 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
   }
 
   List<ScheduleData> fetch(DateTime date) {
-    return state.value!.where((e) {
-      return date.difference(e.from).inDays == 0 && date.day == e.from.day;
-    }).toList();
+    if (state.value != null) {
+      return state.value!.where(
+        (e) {
+          return date.difference(e.from).inDays == 0 && date.day == e.from.day;
+        },
+      ).toList();
+    }
+    return List.empty();
   }
 }

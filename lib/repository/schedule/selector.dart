@@ -9,6 +9,9 @@ final targetScheduleProvider = StateProvider<ScheduleData?>((ref) => null);
 final targetNewScheduleDateProvider =
     StateProvider<DateTime>((ref) => DateTime.now());
 
+/// スケジュールデータを編集したかどうか
+final isEditedProvider = StateProvider<bool>((ref) => false);
+
 /// スケジュールデータ
 ///
 /// ID

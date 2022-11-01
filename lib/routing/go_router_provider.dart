@@ -16,11 +16,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: scheduleEditPath,
+        path: createSchedulePath,
         builder: (context, state) => ScheduleEditPage(
           key: state.pageKey,
+          title: "予定の追加",
+          onCreate: true,
         ),
-      )
+      ),
+      GoRoute(
+        path: editSchedulePath,
+        builder: (context, state) => ScheduleEditPage(
+          key: state.pageKey,
+          title: "予定の編集",
+          onCreate: false,
+        ),
+      ),
     ],
     errorBuilder: (context, state) => RouteErrorPage(
       key: state.pageKey,

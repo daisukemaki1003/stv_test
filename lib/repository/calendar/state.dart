@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:stv_test/model/calendar.dart';
 import 'package:stv_test/repository/calendar/selector.dart';
+import 'package:stv_test/utils/create_calendar_list.dart';
 
 /// プロバイダー
 final calendarNotifierProvider =
@@ -20,8 +21,12 @@ class CalendarNotifier extends StateNotifier<List<Calendar>> {
   }
 
   fetchList() async {
-    final calendarList = ref.watch(calendarListProvider);
-    state = calendarList;
+    // final calendarList = ref.watch(calendarListProvider);
+    final year = ref.watch(targetYearProvider);
+    final month = ref.watch(targetMonthProvider);
+
+    state = createCalendarList(year, month);
+    // state = calendarList;
   }
 
   setSchedule(List<ScheduleData> schedules) {
