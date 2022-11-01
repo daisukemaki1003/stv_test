@@ -2,13 +2,52 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/schedule.dart';
 
+/// 選択されたスケジュール
+final targetScheduleProvider = StateProvider<ScheduleData?>((ref) => null);
+
+/// 新規作成時の日付
+final targetNewScheduleDateProvider =
+    StateProvider<DateTime>((ref) => DateTime.now());
+
 /// スケジュールデータ
-final scheduleIdProvider = StateProvider<int?>((ref) => null);
-final scheduleTitleProvider = StateProvider<String>((ref) => "");
-final scheduleFromProvider = StateProvider<DateTime>((ref) => DateTime.now());
-final scheduleToProvider = StateProvider<DateTime>((ref) => DateTime.now());
-final scheduleIsAllDayProvider = StateProvider<bool>((ref) => false);
-final scheduleCommentProvider = StateProvider<String>((ref) => "");
+///
+/// ID
+final scheduleIdProvider = StateProvider<int?>((ref) {
+  final targetSchedule = ref.watch(targetScheduleProvider);
+  return targetSchedule?.id;
+});
+
+/// タイトル
+final scheduleTitleProvider = StateProvider<String>((ref) {
+  final targetSchedule = ref.watch(targetScheduleProvider);
+  return targetSchedule != null ? targetSchedule.title : "";
+});
+
+/// 開始日時
+final scheduleFromProvider = StateProvider<DateTime>((ref) {
+  final targetSchedule = ref.watch(targetScheduleProvider);
+  final targetDate = ref.watch(targetNewScheduleDateProvider);
+  return targetSchedule != null ? targetSchedule.from : targetDate;
+});
+
+/// 終了日時
+final scheduleToProvider = StateProvider<DateTime>((ref) {
+  final targetSchedule = ref.watch(targetScheduleProvider);
+  final targetDate = ref.watch(targetNewScheduleDateProvider);
+  return targetSchedule != null ? targetSchedule.to : targetDate;
+});
+
+/// 終日
+final scheduleIsAllDayProvider = StateProvider<bool>((ref) {
+  final targetSchedule = ref.watch(targetScheduleProvider);
+  return targetSchedule != null ? targetSchedule.isAllDay : false;
+});
+
+/// コメント
+final scheduleCommentProvider = StateProvider<String>((ref) {
+  final targetSchedule = ref.watch(targetScheduleProvider);
+  return targetSchedule != null ? targetSchedule.comment : "";
+});
 
 /// 新規作成
 final newScheduleProvider = StateProvider<ScheduleCompanion>((ref) {

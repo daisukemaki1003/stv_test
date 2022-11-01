@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:stv_test/model/calendar.dart';
 import 'package:stv_test/repository/calendar/selector.dart';
+import 'package:stv_test/repository/schedule/selector.dart';
 import 'package:stv_test/routing/named_route.dart';
 
 class SchedulePage extends ConsumerWidget {
@@ -18,13 +19,27 @@ class SchedulePage extends ConsumerWidget {
     /// 選択中のカレンダーセルデータ
     final targetCell = ref.watch(targetCellProvider.state);
 
+    /// 選択するスケジュールを格納
+    final targetSchedule = ref.watch(targetScheduleProvider.state);
+
+    /// 新規作成時の日時
+    final targetNewScheduleDate =
+        ref.watch(targetNewScheduleDateProvider.state);
+
     /// 表示するページ
     final pages = [
       scheduleCard(
-        context: context,
-        cell: targetCell.state,
-        onPressed: () => context.push(scheduleEditPath),
-      )
+          context: context,
+          cell: targetCell.state,
+          create: (date) {
+            targetSchedule.state = null;
+            targetNewScheduleDate.state = date;
+            context.push(scheduleEditPath);
+          },
+          edit: (schedule) {
+            targetSchedule.state = schedule;
+            context.push(scheduleEditPath);
+          })
     ];
 
     /// PageViewのインデックス
@@ -55,8 +70,15 @@ class SchedulePage extends ConsumerWidget {
 
   scheduleCard({
     required BuildContext context,
+
+    /// セルデータ
     required Calendar cell,
-    required void Function() onPressed,
+
+    /// 新規作成
+    required void Function(DateTime) create,
+
+    /// 編集
+    required void Function(ScheduleData) edit,
   }) {
     /// 日付フォーマット
     final dateFormat = DateFormat('yyyy/M/d');
@@ -86,7 +108,7 @@ class SchedulePage extends ConsumerWidget {
                       Icons.add,
                       color: Colors.blue,
                     ),
-                    onPressed: onPressed,
+                    onPressed: () => create(cell.date),
                   ),
                 ],
               ),
@@ -103,7 +125,10 @@ class SchedulePage extends ConsumerWidget {
                 children: cell.schedules
                     .where((schedule) => schedule.isAllDay)
                     .toList()
-                    .map((e) => scheduleTile(e))
+                    .map((e) => scheduleTile(
+                          schedule: e,
+                          onTap: edit,
+                        ))
                     .toList(),
               ),
 
@@ -112,7 +137,10 @@ class SchedulePage extends ConsumerWidget {
               children: cell.schedules
                   .where((schedule) => !schedule.isAllDay)
                   .toList()
-                  .map((e) => scheduleTile(e))
+                  .map((e) => scheduleTile(
+                        schedule: e,
+                        onTap: edit,
+                      ))
                   .toList(),
             ),
           ],
@@ -121,16 +149,17 @@ class SchedulePage extends ConsumerWidget {
     );
   }
 
-  Widget scheduleTile(ScheduleData schedule) {
+  Widget scheduleTile({
+    required ScheduleData schedule,
+    required Function(ScheduleData) onTap,
+  }) {
     final dateFormat = DateFormat('HH:mm');
 
     return Column(
       children: [
         const Divider(),
         InkWell(
-          onTap: () {
-            print("object");
-          },
+          onTap: () => onTap(schedule),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Row(
