@@ -1,7 +1,6 @@
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/module.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
 import 'package:stv_test/repository/calendar/state.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 

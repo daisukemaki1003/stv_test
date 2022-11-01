@@ -1,12 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// 日付を選択する
+/// 終日かどうかで表示するデータが変化
 Future<DateTime?> datePicker({
   required BuildContext context,
-  required bool allDay,
-  required DateTime selectedDate,
+
+  /// 終日かどうか
+  required bool isAllDay,
+
+  /// 初期値
+  required DateTime date,
 }) async {
-  DateTime newDate = selectedDate;
+  /// 更新した日付を格納
+  DateTime newDate = date;
 
   return showModalBottomSheet<DateTime>(
     context: context,
@@ -33,16 +40,15 @@ Future<DateTime?> datePicker({
             ),
             Expanded(
               child: CupertinoDatePicker(
-                mode: allDay
+                mode: isAllDay
                     ? CupertinoDatePickerMode.date
                     : CupertinoDatePickerMode.dateAndTime,
-                initialDateTime: selectedDate.add(
-                  Duration(minutes: 15 - selectedDate.minute % 15),
+                initialDateTime: date.add(
+                  Duration(minutes: 15 - date.minute % 15),
                 ),
                 minuteInterval: 15,
                 use24hFormat: true,
-                onDateTimeChanged: (DateTime newDateTime) =>
-                    newDate = newDateTime,
+                onDateTimeChanged: (dateTime) => newDate = dateTime,
               ),
             ),
           ],

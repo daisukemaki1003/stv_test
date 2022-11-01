@@ -126,7 +126,7 @@ class SchedulePage extends ConsumerWidget {
               /// 終日でない予定
               Column(
                 children: cell.schedules
-                    .where((schedule) => schedule.isAllDay)
+                    .where((schedule) => !schedule.isAllDay)
                     .toList()
                     .map((e) => scheduleTile(
                           schedule: e,
@@ -138,7 +138,7 @@ class SchedulePage extends ConsumerWidget {
             /// 終日の予定
             Column(
               children: cell.schedules
-                  .where((schedule) => !schedule.isAllDay)
+                  .where((schedule) => schedule.isAllDay)
                   .toList()
                   .map((e) => scheduleTile(
                         schedule: e,
