@@ -167,15 +167,15 @@ class SchedulePage extends ConsumerWidget {
             child: Row(
               children: [
                 SizedBox(
-                  width: 40,
+                  width: 45,
                   child: schedule.isAllDay
-                      ? Column(
+                      ? const Center(child: Text("終日"))
+                      : Column(
                           children: [
                             Text(dateFormat.format(schedule.from)),
                             Text(dateFormat.format(schedule.to)),
                           ],
-                        )
-                      : const Center(child: Text("終日")),
+                        ),
                 ),
                 const SizedBox(
                   height: 50,

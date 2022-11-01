@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 import 'package:stv_test/repository/schedule/state.dart';
@@ -45,6 +46,7 @@ class ScheduleEditPage extends ConsumerWidget {
       backgroundColor: defaultColor,
       appBar: AppBar(
         title: Text(title),
+        elevation: 0,
 
         /// 戻るボタン
         leading: popButton(
@@ -97,11 +99,13 @@ class ScheduleEditPage extends ConsumerWidget {
                     children: [
                       /// 終日選択ボタン
                       allDaySelectionButton(
-                          isAllDay: scheduleIsAllDay.state,
-                          onChanged: (value) {
-                            scheduleIsAllDay.state = value;
-                            isEdited.state = true;
-                          }),
+                        isAllDay: scheduleIsAllDay.state,
+                        onChanged: (value) {
+                          print(value);
+                          scheduleIsAllDay.state = value;
+                          isEdited.state = true;
+                        },
+                      ),
 
                       /// 開始日時ピッカー
                       datePickerTile(
@@ -188,7 +192,7 @@ class ScheduleEditPage extends ConsumerWidget {
       trailing: TextButton(
         onPressed: () async {
           /// 日付選択
-          final result = await _datePicker(
+          final result = await datePicker(
             context: context,
             allDay: false,
             selectedDate: selectedDate,
@@ -235,57 +239,6 @@ class ScheduleEditPage extends ConsumerWidget {
         ),
         child: const Text("保存"),
       ),
-    );
-  }
-
-  Future<DateTime?> _datePicker({
-    required BuildContext context,
-    required bool allDay,
-    required DateTime selectedDate,
-  }) async {
-    DateTime newDate = selectedDate;
-
-    return showModalBottomSheet<DateTime>(
-      context: context,
-      builder: (BuildContext context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height / 3,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text("キャンセル"),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(newDate),
-                      child: const Text("完了"),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: CupertinoDatePicker(
-                  mode: allDay
-                      ? CupertinoDatePickerMode.date
-                      : CupertinoDatePickerMode.dateAndTime,
-                  initialDateTime: selectedDate.add(
-                    Duration(minutes: 15 - selectedDate.minute % 15),
-                  ),
-                  minuteInterval: 15,
-                  use24hFormat: true,
-                  onDateTimeChanged: (DateTime newDateTime) =>
-                      newDate = newDateTime,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 

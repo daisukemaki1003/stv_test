@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
 import 'package:stv_test/repository/calendar/selector.dart';
@@ -10,25 +11,53 @@ class CalendarPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final targetYear = ref.watch(targetYearProvider);
-    final targetMonth = ref.watch(targetMonthProvider);
+    final targetYear = ref.watch(targetYearProvider.state);
+    final targetMonth = ref.watch(targetMonthProvider.state);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("カレンダー")),
+      appBar: AppBar(
+        title: const Text("カレンダー"),
+        elevation: 0,
+      ),
       body: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              /// 今日ボタン
-              todayButton(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /// 今日ボタン
+                todayButton(() {
+                  final now = DateTime.now();
+                  targetYear.state = now.year;
+                  targetMonth.state = now.month;
+                }),
 
-              /// 月選択ピッカー
-              monthPicker(targetYear, targetMonth),
+                /// 月選択ピッカー
+                monthPicker(
+                  year: targetYear.state,
+                  month: targetMonth.state,
+                  onPressed: () async {
+                    /// 日付選択
+                    final result = await datePicker(
+                      context: context,
+                      allDay: true,
+                      selectedDate:
+                          DateTime(targetYear.state, targetMonth.state),
+                    );
 
-              Container(),
-            ],
+                    /// 選択された日時で上書き
+                    if (result != null) {
+                      targetYear.state = result.year;
+                      targetMonth.state = result.month;
+                    }
+                  },
+                ),
+
+                Container(),
+              ],
+            ),
           ),
 
           /// 週ヘッダー
@@ -65,7 +94,11 @@ class CalendarPage extends ConsumerWidget {
     );
   }
 
-  Widget monthPicker(int year, int month) {
+  Widget monthPicker({
+    required int year,
+    required int month,
+    required Function() onPressed,
+  }) {
     return Row(
       children: [
         Text(
@@ -76,16 +109,16 @@ class CalendarPage extends ConsumerWidget {
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: onPressed,
           icon: const Icon(Icons.arrow_drop_down),
         ),
       ],
     );
   }
 
-  Widget todayButton() {
+  Widget todayButton(Function() onPressed) {
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.transparent,
         shape: RoundedRectangleBorder(
