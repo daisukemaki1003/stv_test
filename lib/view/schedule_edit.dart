@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,10 +13,10 @@ class ScheduleEditPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    /// Notifier
+    /// スケジュール Notifier
     final scheduleNotifier = ref.watch(scheduleNotifierProvider.notifier);
 
-    /// State
+    /// スケジュール State
     final scheduleTitle = ref.watch(scheduleTitleProvider.state);
     final scheduleFrom = ref.watch(scheduleFromProvider.state);
     final scheduleTo = ref.watch(scheduleToProvider.state);

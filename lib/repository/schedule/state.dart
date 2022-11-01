@@ -37,4 +37,10 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
     final schedules = await _dataSource.fetchAll();
     state = AsyncValue.data(schedules);
   }
+
+  List<ScheduleData> fetch(DateTime date) {
+    return state.value!.where((e) {
+      return date.difference(e.from).inDays == 0 && date.day == e.from.day;
+    }).toList();
+  }
 }

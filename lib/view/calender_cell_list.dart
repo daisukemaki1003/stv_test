@@ -39,7 +39,7 @@ class CalendarCellListContainer extends ConsumerWidget {
             return weekRow(
               context: context,
               calendarList: calendarListItem,
-              onTap: (DateTime date) => targetDate.state = date,
+              onTap: (date) => targetDate.state = date,
             );
           }).toList(),
         );
@@ -106,12 +106,12 @@ class CalendarCellListContainer extends ConsumerWidget {
     }
 
     return InkWell(
-      onTap: () {
+      onTap: () async {
         /// タップした日付を設定
         onTap(calendar.date);
 
         /// 予定一覧をダイアログ表示
-        showDialog(
+        await showDialog(
           context: context,
           builder: (_) {
             return Column(
