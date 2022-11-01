@@ -24,12 +24,12 @@ class CalendarCellListContainer extends ConsumerWidget {
     /// スケジュールリスト
     final scheduleNotifier = ref.watch(scheduleNotifierProvider);
 
-    return scheduleNotifier.map(
-      error: (_) => const Center(child: Text('On Error')),
-      loading: (_) => const CircularProgressIndicator(),
+    return scheduleNotifier.when(
+      error: (error, stacktrace) => Text(error.toString()),
+      loading: CircularProgressIndicator.new,
       data: (data) {
         /// スケジュールセット
-        calendarNotifier.setSchedule(data.value);
+        calendarNotifier.setSchedule(data);
 
         /// 週ごとのデータに加工
         final calendarListweekly = to2Dim(calendar);
@@ -39,7 +39,7 @@ class CalendarCellListContainer extends ConsumerWidget {
             return weekRow(
               context: context,
               calendarList: calendarListItem,
-              onTap: (DateTime date) => targetDate.state = date,
+              onTap: (date) => targetDate.state = date,
             );
           }).toList(),
         );
@@ -106,12 +106,12 @@ class CalendarCellListContainer extends ConsumerWidget {
     }
 
     return InkWell(
-      onTap: () {
+      onTap: () async {
         /// タップした日付を設定
         onTap(calendar.date);
 
         /// 予定一覧をダイアログ表示
-        showDialog(
+        await showDialog(
           context: context,
           builder: (_) {
             return Column(
