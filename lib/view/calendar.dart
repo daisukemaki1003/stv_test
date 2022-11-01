@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
-import 'package:stv_test/view/schedule.dart';
+import 'package:stv_test/repository/calendar/selector.dart';
+import 'package:stv_test/view/calender_cell_list.dart';
 
-class CalendarPage extends StatelessWidget {
-  static const String routeName = '/calendar-page';
+class CalendarPage extends ConsumerWidget {
   const CalendarPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    /// 週ヘッダー内のテキストスタイル
-    const defaultWeekHeaderTextStyle = TextStyle(fontSize: defaltFontSize);
-    const saturdayWeekHeaderTextStyle =
-        TextStyle(fontSize: defaltFontSize, color: saturdayTextColor);
-    const sundayWeekHeaderTextStyle =
-        TextStyle(fontSize: defaltFontSize, color: sundayTextColor);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final targetYear = ref.watch(targetYearProvider);
+    final targetMonth = ref.watch(targetMonthProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -28,132 +25,34 @@ class CalendarPage extends StatelessWidget {
               todayButton(),
 
               /// 月選択ピッカー
-              monthPicker(),
+              monthPicker(targetYear, targetMonth),
 
               Container(),
             ],
           ),
 
           /// 週ヘッダー
-          weekHeader(
-            weekHeaderColor,
-            defaultWeekHeaderTextStyle,
-            saturdayWeekHeaderTextStyle,
-            sundayWeekHeaderTextStyle,
-          ),
+          weekHeader(),
 
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
-          weekRow(context),
+          /// カレンダーセル
+          const CalendarCellListContainer(),
         ],
       ),
     );
   }
 
-  Widget weekRow(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, false, false, context),
-          _dateCell(false, false, true, false, context),
-          _dateCell(true, true, false, true, context),
-        ],
-      ),
-    );
-  }
+  Widget weekHeader() {
+    const defaultWeekHeaderTextStyle = TextStyle(fontSize: defaltFontSize);
+    const saturdayWeekHeaderTextStyle =
+        TextStyle(fontSize: defaltFontSize, color: saturdayTextColor);
+    const sundayWeekHeaderTextStyle =
+        TextStyle(fontSize: defaltFontSize, color: sundayTextColor);
 
-  Widget _dateCell(
-    bool pran,
-    bool today,
-    bool saturday,
-    bool sunday,
-    BuildContext context,
-  ) {
-    final Color textColor;
-    if (saturday) {
-      textColor = saturdayTextColor;
-    } else if (sunday) {
-      textColor = sundayTextColor;
-    } else {
-      textColor = defaltTextColor;
-    }
-
-    return InkWell(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (_) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                SchedulePage(),
-              ],
-            );
-          },
-        );
-      },
-      child: SizedBox(
-        height: 65,
-        width: 40,
-        child: Stack(
-          fit: StackFit.loose,
-          children: [
-            Container(
-              decoration: today
-                  ? const BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                    )
-                  : null,
-              child: Center(
-                child: Text(
-                  "12",
-                  style: TextStyle(
-                    color: today ? Colors.white : textColor,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-
-            /// 予定が存在する
-            if (pran)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: const BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget weekHeader(
-      Color weekHeaderColor,
-      TextStyle defaultWeekHeaderTextStyle,
-      TextStyle saturdayWeekHeaderTextStyle,
-      TextStyle sundayWeekHeaderTextStyle) {
     return Container(
       color: weekHeaderColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
+        children: const [
           Text("月", style: defaultWeekHeaderTextStyle),
           Text("火", style: defaultWeekHeaderTextStyle),
           Text("水", style: defaultWeekHeaderTextStyle),
@@ -166,12 +65,12 @@ class CalendarPage extends StatelessWidget {
     );
   }
 
-  Widget monthPicker() {
+  Widget monthPicker(int year, int month) {
     return Row(
       children: [
-        const Text(
-          "2021年8月",
-          style: TextStyle(
+        Text(
+          "$year年$month月",
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),

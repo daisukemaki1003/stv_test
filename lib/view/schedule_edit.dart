@@ -1,36 +1,48 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:stv_test/constraints/color.dart';
+import 'package:stv_test/repository/schedule/selector.dart';
+import 'package:stv_test/repository/schedule/state.dart';
+import 'package:stv_test/routing/named_route.dart';
 
-class ScheduleEditPage extends StatelessWidget {
-  static const String routeName = '/schedule-edit-page';
-
+class ScheduleEditPage extends ConsumerWidget {
   const ScheduleEditPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    /// Notifier
+    final scheduleNotifier = ref.watch(scheduleNotifierProvider.notifier);
+
+    /// State
+    final scheduleTitle = ref.watch(scheduleTitleProvider.state);
+    final scheduleFrom = ref.watch(scheduleFromProvider.state);
+    final scheduleTo = ref.watch(scheduleToProvider.state);
+    final scheduleIsAllDay = ref.watch(scheduleIsAllDayProvider.state);
+    final scheduleComment = ref.watch(scheduleCommentProvider.state);
+
+    /// 日付フォーマット
+    final DateFormat dateFormat;
+    if (scheduleIsAllDay.state) {
+      dateFormat = DateFormat('yyyy-MM-dd'); // 終日
+    } else {
+      dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+    }
+
     return Scaffold(
       backgroundColor: defaultColor,
       appBar: AppBar(
         title: const Text("予定の追加"),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            child: TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                backgroundColor: defaultColor,
-              ),
-              child: const Text("保存"),
-            ),
-          ),
-        ],
+
+        /// 戻るボタン
+        leading: popButton(context),
+
+        /// 保存ボタン
+        actions: [saveButton(save: scheduleNotifier.create)],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -40,16 +52,50 @@ class ScheduleEditPage extends StatelessWidget {
               /// タイトル
               Padding(
                 padding: const EdgeInsets.only(bottom: 30),
-                child: titleInputField(),
+                child: titleInputField(
+                  title: scheduleTitle.state,
+                  onChanged: (value) => scheduleTitle.state = value,
+                ),
               ),
 
-              /// 予定日選択
-              scheduledDateSelectionTile(context),
+              Container(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    /// 終日選択ボタン
+                    allDaySelectionButton(
+                      isAllDay: scheduleIsAllDay.state,
+                      onChanged: (value) => scheduleIsAllDay.state = value,
+                    ),
+
+                    /// 開始日時ピッカー
+                    datePickerTile(
+                      context: context,
+                      title: "開始",
+                      selectedDate: scheduleFrom.state,
+                      onChange: (date) => scheduleFrom.state = date,
+                      dateFormat: dateFormat,
+                    ),
+
+                    /// 終了日時ピッカー
+                    datePickerTile(
+                      context: context,
+                      title: "終了",
+                      selectedDate: scheduleTo.state,
+                      onChange: (date) => scheduleTo.state = date,
+                      dateFormat: dateFormat,
+                    ),
+                  ],
+                ),
+              ),
 
               /// コメント
               Padding(
                 padding: const EdgeInsets.only(top: 10),
-                child: commentInputField(),
+                child: commentInputField(
+                  comment: scheduleComment.state,
+                  onChanged: (value) => scheduleComment.state = value,
+                ),
               ),
 
               /// 削除ボタン
@@ -64,8 +110,74 @@ class ScheduleEditPage extends StatelessWidget {
     );
   }
 
-  void datePicker(BuildContext context, bool allDay) async {
-    showModalBottomSheet(
+  Widget datePickerTile({
+    required BuildContext context,
+    required String title,
+    required DateTime selectedDate,
+    required Function(DateTime) onChange,
+    required DateFormat dateFormat,
+  }) {
+    return ListTile(
+      title: Text(title),
+      trailing: TextButton(
+        onPressed: () async {
+          /// 日付選択
+          final result = await _datePicker(
+            context: context,
+            allDay: false,
+            selectedDate: selectedDate,
+          );
+
+          /// 選択された日時で上書き
+          if (result != null) onChange(result);
+        },
+
+        /// フォーマットに応じて日付表示
+        child: Text(dateFormat.format(selectedDate)),
+      ),
+    );
+  }
+
+  Widget allDaySelectionButton({
+    required bool isAllDay,
+    required Function(bool) onChanged,
+  }) {
+    return SwitchListTile(
+      value: isAllDay,
+      title: const Text("終日"),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget popButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.close),
+      onPressed: () => context.go(calendarPath),
+    );
+  }
+
+  Widget saveButton({required Function() save}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      child: TextButton(
+        onPressed: save,
+        style: TextButton.styleFrom(
+          backgroundColor: defaultColor,
+        ),
+        child: const Text("保存"),
+      ),
+    );
+  }
+
+  Future<DateTime?> _datePicker({
+    required BuildContext context,
+    required bool allDay,
+    required DateTime selectedDate,
+  }) async {
+    ///
+    DateTime date = selectedDate;
+
+    return showModalBottomSheet<DateTime>(
       context: context,
       builder: (BuildContext context) {
         return SizedBox(
@@ -77,8 +189,14 @@ class ScheduleEditPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(onPressed: () {}, child: const Text("キャンセル")),
-                    TextButton(onPressed: () {}, child: const Text("完了")),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("キャンセル"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(date),
+                      child: const Text("完了"),
+                    ),
                   ],
                 ),
               ),
@@ -92,7 +210,8 @@ class ScheduleEditPage extends StatelessWidget {
                   ),
                   minuteInterval: 15,
                   use24hFormat: true,
-                  onDateTimeChanged: (DateTime newDateTime) {},
+                  onDateTimeChanged: (DateTime newDateTime) =>
+                      date = newDateTime,
                 ),
               ),
             ],
@@ -174,7 +293,10 @@ class ScheduleEditPage extends StatelessWidget {
     );
   }
 
-  Widget commentInputField() {
+  Widget commentInputField({
+    required String comment,
+    required Function(String) onChanged,
+  }) {
     return TextFormField(
       minLines: 5,
       maxLines: 15,
@@ -191,43 +313,15 @@ class ScheduleEditPage extends StatelessWidget {
           borderSide: BorderSide(width: 2.0, color: Colors.blue),
         ),
       ),
+      initialValue: comment,
+      onChanged: onChanged,
     );
   }
 
-  Widget scheduledDateSelectionTile(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          SwitchListTile(
-            value: true,
-            title: const Text("終日"),
-            onChanged: (bool value) {},
-          ),
-          ListTile(
-            title: const Text("終日"),
-            trailing: TextButton(
-              onPressed: () {
-                datePicker(context, true);
-              },
-              child: const Text("2018-08-03 10:00"),
-            ),
-          ),
-          ListTile(
-            title: const Text("終了"),
-            trailing: TextButton(
-              onPressed: () {
-                datePicker(context, false);
-              },
-              child: const Text("2018-08-03 10:00"),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget titleInputField() {
+  Widget titleInputField({
+    required String title,
+    required Function(String) onChanged,
+  }) {
     return TextFormField(
       decoration: InputDecoration(
         hintText: 'タイトルを入力してください',
@@ -242,6 +336,8 @@ class ScheduleEditPage extends StatelessWidget {
           borderSide: BorderSide(width: 2.0, color: Colors.blue),
         ),
       ),
+      initialValue: title,
+      onChanged: onChanged,
     );
   }
 }
