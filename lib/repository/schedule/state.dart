@@ -26,13 +26,11 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
   create() async {
     final newSchedule = ref.watch(newScheduleProvider);
     await _dataSource.createSchedule(newSchedule);
-    // ref.refresh(diariesNotifierProvider);
   }
 
   update() async {
     final newSchedule = ref.watch(editScheduleProvider);
     await _dataSource.updateSchedule(newSchedule);
-    // ref.refresh(diariesNotifierProvider);
   }
 
   fetchAll() async {

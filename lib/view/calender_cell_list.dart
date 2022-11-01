@@ -4,6 +4,7 @@ import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/model/calendar.dart';
 import 'package:stv_test/repository/calendar/selector.dart';
 import 'package:stv_test/repository/calendar/state.dart';
+import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/utils/create_calendar_list.dart';
 import 'package:stv_test/view/schedule.dart';
 
@@ -16,27 +17,34 @@ class CalendarCellListContainer extends ConsumerWidget {
     final targetDate = ref.watch(targetDateProvider.state);
 
     /// 選択中の月のカレンダーリスト
-    final calendarList = ref.watch(calendarNotifierProvider);
+    final calendar = ref.watch(calendarNotifierProvider);
 
-    return calendarList.map(
-        error: (_) => const Center(child: Text('On Error')),
-        loading: (_) => const CircularProgressIndicator(),
-        data: (data) {
-          /// 週ごとのデータに加工
-          final calendarListweekly = to2Dim(data.value);
-          return Column(
-            children: calendarListweekly.map((calendarListItem) {
-              /// 週ごとのカレンダーセルを表示
-              return weekRow(
-                context: context,
-                calendarList: calendarListItem,
-                onTap: (DateTime date) {
-                  targetDate.state = date;
-                },
-              );
-            }).toList(),
-          );
-        });
+    final calendarNotifier = ref.watch(calendarNotifierProvider.notifier);
+
+    /// スケジュールリスト
+    final scheduleNotifier = ref.watch(scheduleNotifierProvider);
+
+    return scheduleNotifier.map(
+      error: (_) => const Center(child: Text('On Error')),
+      loading: (_) => const CircularProgressIndicator(),
+      data: (data) {
+        /// スケジュールセット
+        calendarNotifier.setSchedule(data.value);
+
+        /// 週ごとのデータに加工
+        final calendarListweekly = to2Dim(calendar);
+        return Column(
+          children: calendarListweekly.map((calendarListItem) {
+            /// 週ごとのカレンダーセルを表示
+            return weekRow(
+              context: context,
+              calendarList: calendarListItem,
+              onTap: (DateTime date) => targetDate.state = date,
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 
   Widget weekRow({
@@ -76,7 +84,7 @@ class CalendarCellListContainer extends ConsumerWidget {
     final Color calendarCellTextColor;
     if (!calendar.enabled) {
       calendarCellTextColor = Colors.black12;
-    } else if (calendar.isToday()) {
+    } else if (calendar.isThatDay(DateTime.now())) {
       calendarCellTextColor = Colors.white;
     } else if (calendar.date.weekday == DateTime.saturday) {
       calendarCellTextColor = saturdayTextColor;
@@ -88,7 +96,7 @@ class CalendarCellListContainer extends ConsumerWidget {
 
     /// 日付が今日の場合は青い丸で囲む
     final BoxDecoration todayBoxDecoration;
-    if (calendar.isToday()) {
+    if (calendar.isThatDay(DateTime.now())) {
       todayBoxDecoration = const BoxDecoration(
         color: Colors.blue,
         shape: BoxShape.circle,
@@ -132,7 +140,7 @@ class CalendarCellListContainer extends ConsumerWidget {
             ),
 
             /// 予定が存在する
-            if (false)
+            if (calendar.schedules.isNotEmpty)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(

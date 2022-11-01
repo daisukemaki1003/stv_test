@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
+import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/routing/named_route.dart';
 
 class ScheduleEditPage extends ConsumerWidget {
@@ -14,6 +15,9 @@ class ScheduleEditPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    /// Notifier
+    final scheduleNotifier = ref.watch(scheduleNotifierProvider.notifier);
+
     /// State
     final scheduleTitle = ref.watch(scheduleTitleProvider.state);
     final scheduleFrom = ref.watch(scheduleFromProvider.state);
@@ -24,9 +28,9 @@ class ScheduleEditPage extends ConsumerWidget {
     /// 日付フォーマット
     final DateFormat dateFormat;
     if (scheduleIsAllDay.state) {
-      dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+      dateFormat = DateFormat('yyyy-MM-dd'); // 終日
     } else {
-      dateFormat = DateFormat('yyyy-MM-dd');
+      dateFormat = DateFormat('yyyy-MM-dd HH:mm');
     }
 
     return Scaffold(
@@ -38,7 +42,7 @@ class ScheduleEditPage extends ConsumerWidget {
         leading: popButton(context),
 
         /// 保存ボタン
-        actions: [saveButton()],
+        actions: [saveButton(save: scheduleNotifier.create)],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -152,11 +156,11 @@ class ScheduleEditPage extends ConsumerWidget {
     );
   }
 
-  Widget saveButton() {
+  Widget saveButton({required Function() save}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: TextButton(
-        onPressed: () {},
+        onPressed: save,
         style: TextButton.styleFrom(
           backgroundColor: defaultColor,
         ),
