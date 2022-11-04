@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
-import 'package:stv_test/view/calender_cell_list.dart';
+import 'package:stv_test/view/calender_cell_list/calender_cell_list_container.dart';
 
-class CalendarPage extends ConsumerWidget {
-  const CalendarPage({super.key});
+class CalendarPageComponent extends StatelessWidget {
+  const CalendarPageComponent({
+    super.key,
+    required this.targetDate,
+    required this.targetDateOnChange,
+  });
+
+  final DateTime targetDate;
+  final Function(DateTime) targetDateOnChange;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final targetYear = ref.watch(targetYearProvider.state);
-    final targetMonth = ref.watch(targetMonthProvider.state);
-
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -30,28 +33,14 @@ class CalendarPage extends ConsumerWidget {
                 /// 今日ボタン
                 todayButton(() {
                   final now = DateTime.now();
-                  targetYear.state = now.year;
-                  targetMonth.state = now.month;
+                  targetDateOnChange(now);
                 }),
 
                 /// 月選択ピッカー
                 monthPicker(
-                  year: targetYear.state,
-                  month: targetMonth.state,
-                  onPressed: () async {
-                    /// 日付選択
-                    final result = await datePicker(
-                      context: context,
-                      isAllDay: true,
-                      date: DateTime(targetYear.state, targetMonth.state),
-                    );
-
-                    /// 選択された日時で上書き
-                    if (result != null) {
-                      targetYear.state = result.year;
-                      targetMonth.state = result.month;
-                    }
-                  },
+                  context: context,
+                  date: targetDate,
+                  onChangeed: targetDateOnChange,
                 ),
 
                 Container(),
@@ -95,21 +84,30 @@ class CalendarPage extends ConsumerWidget {
   }
 
   Widget monthPicker({
-    required int year,
-    required int month,
-    required Function() onPressed,
+    required BuildContext context,
+    required DateTime date,
+    required Function(DateTime) onChangeed,
   }) {
     return Row(
       children: [
         Text(
-          "$year年$month月",
+          DateFormat('yyyy年MM月').format(date),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
         ),
         IconButton(
-          onPressed: onPressed,
+          onPressed: () async {
+            final result = await datePicker(
+              context: context,
+              isAllDay: true,
+              date: targetDate,
+            );
+            if (result != null) {
+              onChangeed(result);
+            }
+          },
           icon: const Icon(Icons.arrow_drop_down),
         ),
       ],

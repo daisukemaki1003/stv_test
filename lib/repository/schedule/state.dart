@@ -24,25 +24,25 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
 
   Future<void> initialize() async => await fetchAll();
 
-  create() async {
-    final newSchedule = ref.watch(newScheduleProvider);
-    await _dataSource.createSchedule(newSchedule);
+  Future create(ScheduleCompanion schedule) async {
+    // final newSchedule = ref.watch(newScheduleProvider);
+    await _dataSource.createSchedule(schedule);
     ref.refresh(scheduleNotifierProvider);
   }
 
-  update() async {
-    final newSchedule = ref.watch(editScheduleProvider);
-    await _dataSource.updateSchedule(newSchedule);
+  Future update(ScheduleData schedule) async {
+    // final newSchedule = ref.watch(editScheduleProvider);
+    await _dataSource.updateSchedule(schedule);
   }
 
-  delete() async {
+  Future delete() async {
     final target = ref.watch(targetScheduleProvider);
     await _dataSource.deleteSchedule(target!.id);
     ref.refresh(scheduleNotifierProvider);
     ref.refresh(calendarNotifierProvider);
   }
 
-  fetchAll() async {
+  Future fetchAll() async {
     final schedules = await _dataSource.fetchAll();
     state = AsyncValue.data(schedules);
   }

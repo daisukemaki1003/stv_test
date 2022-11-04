@@ -10,50 +10,50 @@ final targetNewScheduleDateProvider =
     StateProvider<DateTime>((ref) => DateTime.now());
 
 /// スケジュールデータを編集したかどうか
-final isEditedProvider = StateProvider<bool>((ref) => false);
+final isEditedProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 /// スケジュールデータ
 ///
 /// ID
-final scheduleIdProvider = StateProvider<int?>((ref) {
+final scheduleIdProvider = StateProvider.autoDispose<int?>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   return targetSchedule?.id;
 });
 
 /// タイトル
-final scheduleTitleProvider = StateProvider<String>((ref) {
+final scheduleTitleProvider = StateProvider.autoDispose<String>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   return targetSchedule != null ? targetSchedule.title : "";
 });
 
 /// 開始日時
-final scheduleFromProvider = StateProvider<DateTime>((ref) {
+final scheduleFromProvider = StateProvider.autoDispose<DateTime>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   final targetDate = ref.watch(targetNewScheduleDateProvider);
   return targetSchedule != null ? targetSchedule.from : targetDate;
 });
 
 /// 終了日時
-final scheduleToProvider = StateProvider<DateTime>((ref) {
+final scheduleToProvider = StateProvider.autoDispose<DateTime>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   final targetDate = ref.watch(targetNewScheduleDateProvider);
   return targetSchedule != null ? targetSchedule.to : targetDate;
 });
 
 /// 終日
-final scheduleIsAllDayProvider = StateProvider<bool>((ref) {
+final scheduleIsAllDayProvider = StateProvider.autoDispose<bool>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   return targetSchedule != null ? targetSchedule.isAllDay : false;
 });
 
 /// コメント
-final scheduleCommentProvider = StateProvider<String>((ref) {
+final scheduleCommentProvider = StateProvider.autoDispose<String>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   return targetSchedule != null ? targetSchedule.comment : "";
 });
 
 /// 新規作成
-final newScheduleProvider = StateProvider<ScheduleCompanion>((ref) {
+final newScheduleProvider = StateProvider.autoDispose<ScheduleCompanion>((ref) {
   final title = ref.watch(scheduleTitleProvider);
   final from = ref.watch(scheduleFromProvider);
   final to = ref.watch(scheduleToProvider);
@@ -70,7 +70,7 @@ final newScheduleProvider = StateProvider<ScheduleCompanion>((ref) {
 });
 
 /// 編集
-final editScheduleProvider = StateProvider<ScheduleData>((ref) {
+final editScheduleProvider = StateProvider.autoDispose<ScheduleData>((ref) {
   final id = ref.watch(scheduleIdProvider);
   final title = ref.watch(scheduleTitleProvider);
   final from = ref.watch(scheduleFromProvider);

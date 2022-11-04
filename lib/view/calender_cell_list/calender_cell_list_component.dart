@@ -1,49 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/model/calendar.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
-import 'package:stv_test/repository/calendar/state.dart';
-import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/utils/create_calendar_list.dart';
-import 'package:stv_test/view/schedule.dart';
+import 'package:stv_test/view/schedule/schedule_page.dart';
 
-class CalendarCellListContainer extends ConsumerWidget {
-  const CalendarCellListContainer({super.key});
+class CalendarCellListComponent extends StatelessWidget {
+  const CalendarCellListComponent({
+    super.key,
+    required this.calendar,
+    required this.calendarCellOnTap,
+  });
+
+  final List<Calendar> calendar;
+  final Function(DateTime) calendarCellOnTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    /// 選択中の日付
-    final targetDate = ref.watch(targetDateProvider.state);
-
-    /// 選択中の月のカレンダーリスト
-    final calendar = ref.watch(calendarNotifierProvider);
-
-    final calendarNotifier = ref.watch(calendarNotifierProvider.notifier);
-
-    /// スケジュールリスト
-    final scheduleNotifier = ref.watch(scheduleNotifierProvider);
-
-    return scheduleNotifier.when(
-      error: (error, stacktrace) => Text(error.toString()),
-      loading: CircularProgressIndicator.new,
-      data: (data) {
-        /// スケジュールセット
-        calendarNotifier.setSchedule(data);
-
-        /// 週ごとのデータに加工
-        final calendarListweekly = to2Dim(calendar);
-        return Column(
-          children: calendarListweekly.map((calendarListItem) {
-            /// 週ごとのカレンダーセルを表示
-            return weekRow(
-              context: context,
-              calendarList: calendarListItem,
-              onTap: (date) => targetDate.state = date,
-            );
-          }).toList(),
+  Widget build(BuildContext context) {
+    return Column(
+      /// 週ごとのデータに加工
+      children: to2Dim(calendar).map((calendarListItem) {
+        /// 週ごとのカレンダーセルを表示
+        return weekRow(
+          context: context,
+          calendarList: calendarListItem,
+          onTap: calendarCellOnTap,
         );
-      },
+      }).toList(),
     );
   }
 

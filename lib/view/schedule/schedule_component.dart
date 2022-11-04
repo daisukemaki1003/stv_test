@@ -1,48 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:stv_test/model/calendar.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
-import 'package:stv_test/repository/schedule/selector.dart';
-import 'package:stv_test/routing/named_route.dart';
 
-class SchedulePage extends ConsumerWidget {
-  const SchedulePage({super.key});
+class SchedulePageComponent extends StatefulWidget {
+  const SchedulePageComponent({
+    super.key,
+    required this.calendarCell,
+    required this.createSchedule,
+    required this.updateSchedule,
+    required this.onPrevDay,
+    required this.onNextDay,
+  });
+
+  final Calendar calendarCell;
+  final Function(DateTime) createSchedule;
+  final Function(ScheduleData) updateSchedule;
+
+  final Function() onPrevDay;
+  final Function() onNextDay;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    /// 選択中の日付
-    final targetDate = ref.watch(targetDateProvider.state);
+  State<SchedulePageComponent> createState() => SchedulePageComponentState();
+}
 
-    /// 選択中のカレンダーセルデータ
-    final targetCell = ref.watch(targetCellProvider.state);
-
-    /// 選択するスケジュールを格納
-    final targetSchedule = ref.watch(targetScheduleProvider.state);
-
-    /// 新規作成時の日時
-    final targetNewScheduleDate =
-        ref.watch(targetNewScheduleDateProvider.state);
-
+class SchedulePageComponentState extends State<SchedulePageComponent> {
+  @override
+  Widget build(BuildContext context) {
     /// PageViewのインデックス
-    final pageIndex = ref.watch(pageIndexProvider.state);
+    int pageIndex = 0;
 
     /// 表示するページ
     final pages = [
       scheduleCard(
         context: context,
-        cell: targetCell.state,
-        create: (date) {
-          targetSchedule.state = null;
-          targetNewScheduleDate.state = date;
-          context.push(createSchedulePath);
-        },
-        edit: (schedule) {
-          targetSchedule.state = schedule;
-          context.push(editSchedulePath);
-        },
+        cell: widget.calendarCell,
+        create: widget.createSchedule,
+        update: widget.updateSchedule,
       )
     ];
 
@@ -57,13 +51,15 @@ class SchedulePage extends ConsumerWidget {
         },
         onPageChanged: (index) {
           /// スワイプに応じて日付を更新
-          if (pageIndex.state < index) {
-            targetDate.state = targetDate.state.add(const Duration(days: 1));
+          if (pageIndex < index) {
+            widget.onNextDay();
           } else {
-            targetDate.state = targetDate.state.add(const Duration(days: -1));
+            widget.onPrevDay();
           }
 
-          pageIndex.state = index;
+          setState(() {
+            pageIndex = index;
+          });
         },
       ),
     );
@@ -79,7 +75,7 @@ class SchedulePage extends ConsumerWidget {
     required void Function(DateTime) create,
 
     /// 編集
-    required void Function(ScheduleData) edit,
+    required void Function(ScheduleData) update,
   }) {
     /// 日付フォーマット
     final dateFormat = DateFormat('yyyy/M/d');
@@ -130,7 +126,7 @@ class SchedulePage extends ConsumerWidget {
                     .toList()
                     .map((e) => scheduleTile(
                           schedule: e,
-                          onTap: edit,
+                          onTap: update,
                         ))
                     .toList(),
               ),
@@ -142,7 +138,7 @@ class SchedulePage extends ConsumerWidget {
                   .toList()
                   .map((e) => scheduleTile(
                         schedule: e,
-                        onTap: edit,
+                        onTap: update,
                       ))
                   .toList(),
             ),

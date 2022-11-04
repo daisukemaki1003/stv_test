@@ -21,12 +21,13 @@ class CalendarNotifier extends StateNotifier<List<Calendar>> {
   }
 
   fetchList() async {
-    // final calendarList = ref.watch(calendarListProvider);
-    final year = ref.watch(targetYearProvider);
-    final month = ref.watch(targetMonthProvider);
+    final selectedYearAndMonthInCalendar =
+        ref.watch(selectedYearAndMonthInCalendarProvider);
 
-    state = createCalendarList(year, month);
-    // state = calendarList;
+    state = createCalendarList(
+      selectedYearAndMonthInCalendar.year,
+      selectedYearAndMonthInCalendar.month,
+    );
   }
 
   setSchedule(List<ScheduleData> schedules) {
