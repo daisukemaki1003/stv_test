@@ -1,69 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/data_source/schedule.dart';
-import 'package:stv_test/model/calendar.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
-import 'package:stv_test/repository/schedule/selector.dart';
-import 'package:stv_test/routing/named_route.dart';
 
-class SchedulePage extends ConsumerWidget {
-  const SchedulePage({super.key});
+class SchedulePageComponent extends StatelessWidget {
+  const SchedulePageComponent({
+    super.key,
+    required this.selectedDate,
+    required this.createSchedule,
+    required this.updateSchedule,
+    required this.fetchSchedule,
+  });
+
+  final DateTime selectedDate;
+  final Function(DateTime) createSchedule;
+  final Function(ScheduleData) updateSchedule;
+  final Function(DateTime) fetchSchedule;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    /// 選択中の日付
-    final targetDate = ref.watch(targetDateProvider.state);
-
-    /// 選択中のカレンダーセルデータ
-    final targetCell = ref.watch(targetCellProvider.state);
-
-    /// 選択するスケジュールを格納
-    final targetSchedule = ref.watch(targetScheduleProvider.state);
-
-    /// 新規作成時の日時
-    final targetNewScheduleDate =
-        ref.watch(targetNewScheduleDateProvider.state);
-
-    /// PageViewのインデックス
-    final pageIndex = ref.watch(pageIndexProvider.state);
-
-    /// 表示するページ
-    final pages = [
-      scheduleCard(
-        context: context,
-        cell: targetCell.state,
-        create: (date) {
-          targetSchedule.state = null;
-          targetNewScheduleDate.state = date;
-          context.push(createSchedulePath);
-        },
-        edit: (schedule) {
-          targetSchedule.state = schedule;
-          context.push(editSchedulePath);
-        },
-      )
-    ];
-
+  Widget build(BuildContext context) {
+    int initialPage = 999;
+    final controller =
+        PageController(viewportFraction: 0.9, initialPage: initialPage);
     return Container(
       height: 600,
       alignment: Alignment.bottomCenter,
       color: Colors.transparent,
       child: PageView.builder(
-        controller: PageController(viewportFraction: 0.9, initialPage: 999),
-        itemBuilder: (context, index) {
-          return pages[index % pages.length];
-        },
-        onPageChanged: (index) {
-          /// スワイプに応じて日付を更新
-          if (pageIndex.state < index) {
-            targetDate.state = targetDate.state.add(const Duration(days: 1));
-          } else {
-            targetDate.state = targetDate.state.add(const Duration(days: -1));
-          }
-
-          pageIndex.state = index;
+        controller: controller,
+        itemBuilder: (_, index) {
+          final date = selectedDate.add(Duration(days: index - initialPage));
+          return scheduleCard(
+            context: context,
+            selectedDate: date,
+            create: createSchedule,
+            update: updateSchedule,
+            schedules: fetchSchedule(date),
+          );
         },
       ),
     );
@@ -73,17 +45,18 @@ class SchedulePage extends ConsumerWidget {
     required BuildContext context,
 
     /// セルデータ
-    required Calendar cell,
+    required DateTime selectedDate,
 
     /// 新規作成
-    required void Function(DateTime) create,
+    required Function(DateTime) create,
 
     /// 編集
-    required void Function(ScheduleData) edit,
+    required Function(ScheduleData) update,
+    required List<ScheduleData> schedules,
   }) {
     /// 日付フォーマット
-    final dateFormat = DateFormat('yyyy/M/d');
-    final weekText = DateFormat.E('ja').format(cell.date);
+    final dateFormat = DateFormat('yyyy/MM/dd');
+    final weekText = DateFormat.E('ja').format(selectedDate);
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
@@ -100,7 +73,7 @@ class SchedulePage extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${dateFormat.format(cell.date)} （$weekText）',
+                    '${dateFormat.format(selectedDate)} （$weekText）',
                     style: const TextStyle(
                         fontWeight: FontWeight.w500, fontSize: 20),
                   ),
@@ -109,7 +82,7 @@ class SchedulePage extends ConsumerWidget {
                       Icons.add,
                       color: Colors.blue,
                     ),
-                    onPressed: () => create(cell.date),
+                    onPressed: () => create(selectedDate),
                   ),
                 ],
               ),
@@ -118,31 +91,31 @@ class SchedulePage extends ConsumerWidget {
             const Divider(),
 
             /// 予定がない
-            if (cell.schedules.isEmpty) unscheduledCard(),
+            if (schedules.isEmpty) unscheduledCard(),
 
             /// 予定がある
-            if (cell.schedules.isNotEmpty)
+            if (schedules.isNotEmpty)
 
               /// 終日でない予定
               Column(
-                children: cell.schedules
+                children: schedules
                     .where((schedule) => !schedule.isAllDay)
                     .toList()
                     .map((e) => scheduleTile(
                           schedule: e,
-                          onTap: edit,
+                          onTap: () => update(e),
                         ))
                     .toList(),
               ),
 
             /// 終日の予定
             Column(
-              children: cell.schedules
+              children: schedules
                   .where((schedule) => schedule.isAllDay)
                   .toList()
                   .map((e) => scheduleTile(
                         schedule: e,
-                        onTap: edit,
+                        onTap: () => update(e),
                       ))
                   .toList(),
             ),
@@ -154,14 +127,14 @@ class SchedulePage extends ConsumerWidget {
 
   Widget scheduleTile({
     required ScheduleData schedule,
-    required Function(ScheduleData) onTap,
+    required Function() onTap,
   }) {
     final dateFormat = DateFormat('HH:mm');
 
     return Column(
       children: [
         InkWell(
-          onTap: () => onTap(schedule),
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Row(

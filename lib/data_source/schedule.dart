@@ -50,7 +50,7 @@ class ScheduleDataSourceImpl extends _$ScheduleDataSourceImpl
   }
 
   @override
-  Future<List<ScheduleData>> fetchAll() async {
+  Future<List<ScheduleData>> fetchAll() {
     return select(schedule).get();
   }
 }
