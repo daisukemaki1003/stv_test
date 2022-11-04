@@ -6,16 +6,19 @@ import 'package:stv_test/model/calendar.dart';
 class SchedulePageComponent extends StatelessWidget {
   const SchedulePageComponent({
     super.key,
-    required this.calendarCell,
+    required this.selectedDate,
     required this.createSchedule,
     required this.updateSchedule,
     required this.swipe,
+    required this.schedules,
   });
 
-  final Calendar calendarCell;
+  final DateTime selectedDate;
+  final List<ScheduleData> schedules;
   final Function(DateTime) createSchedule;
   final Function(ScheduleData) updateSchedule;
 
+  /// カードをスワイプした時の処理
   final Function(int) swipe;
 
   @override
@@ -24,7 +27,7 @@ class SchedulePageComponent extends StatelessWidget {
     final pages = [
       scheduleCard(
         context: context,
-        cell: calendarCell,
+        selectedDate: selectedDate,
         create: createSchedule,
         update: updateSchedule,
       )
@@ -50,7 +53,7 @@ class SchedulePageComponent extends StatelessWidget {
     required BuildContext context,
 
     /// セルデータ
-    required Calendar cell,
+    required DateTime selectedDate,
 
     /// 新規作成
     required void Function(DateTime) create,
@@ -60,7 +63,7 @@ class SchedulePageComponent extends StatelessWidget {
   }) {
     /// 日付フォーマット
     final dateFormat = DateFormat('yyyy/MM/dd');
-    final weekText = DateFormat.E('ja').format(cell.date);
+    final weekText = DateFormat.E('ja').format(selectedDate);
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
@@ -77,7 +80,7 @@ class SchedulePageComponent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${dateFormat.format(cell.date)} （$weekText）',
+                    '${dateFormat.format(selectedDate)} （$weekText）',
                     style: const TextStyle(
                         fontWeight: FontWeight.w500, fontSize: 20),
                   ),
@@ -86,7 +89,7 @@ class SchedulePageComponent extends StatelessWidget {
                       Icons.add,
                       color: Colors.blue,
                     ),
-                    onPressed: () => create(cell.date),
+                    onPressed: () => create(selectedDate),
                   ),
                 ],
               ),
@@ -95,14 +98,14 @@ class SchedulePageComponent extends StatelessWidget {
             const Divider(),
 
             /// 予定がない
-            if (cell.schedules.isEmpty) unscheduledCard(),
+            if (schedules.isEmpty) unscheduledCard(),
 
             /// 予定がある
-            if (cell.schedules.isNotEmpty)
+            if (schedules.isNotEmpty)
 
               /// 終日でない予定
               Column(
-                children: cell.schedules
+                children: schedules
                     .where((schedule) => !schedule.isAllDay)
                     .toList()
                     .map((e) => scheduleTile(
@@ -114,7 +117,7 @@ class SchedulePageComponent extends StatelessWidget {
 
             /// 終日の予定
             Column(
-              children: cell.schedules
+              children: schedules
                   .where((schedule) => schedule.isAllDay)
                   .toList()
                   .map((e) => scheduleTile(

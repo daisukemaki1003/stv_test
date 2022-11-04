@@ -1,7 +1,6 @@
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/module.dart';
-import 'package:stv_test/repository/calendar/state.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 
 /// プロバイダー
@@ -25,21 +24,19 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
   Future<void> initialize() async => await fetchAll();
 
   Future create(ScheduleCompanion schedule) async {
-    // final newSchedule = ref.watch(newScheduleProvider);
     await _dataSource.createSchedule(schedule);
     ref.refresh(scheduleNotifierProvider);
   }
 
   Future update(ScheduleData schedule) async {
-    // final newSchedule = ref.watch(editScheduleProvider);
     await _dataSource.updateSchedule(schedule);
+    ref.refresh(scheduleNotifierProvider);
   }
 
   Future delete() async {
     final target = ref.watch(targetScheduleProvider);
     await _dataSource.deleteSchedule(target!.id);
     ref.refresh(scheduleNotifierProvider);
-    ref.refresh(calendarNotifierProvider);
   }
 
   Future fetchAll() async {
@@ -47,14 +44,14 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
     state = AsyncValue.data(schedules);
   }
 
-  List<ScheduleData> fetch(DateTime date) {
-    if (state.value != null) {
-      return state.value!.where(
-        (e) {
-          return date.difference(e.from).inDays == 0 && date.day == e.from.day;
-        },
-      ).toList();
+  bool exist(DateTime date) {
+    final data = state.value;
+    if (data == null) return false;
+
+    for (var schedule in data) {
+      if (date.difference(schedule.from).inDays == 0 &&
+          date.day == schedule.from.day) return true;
     }
-    return List.empty();
+    return false;
   }
 }

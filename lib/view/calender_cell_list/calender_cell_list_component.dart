@@ -9,9 +9,16 @@ class CalendarCellListComponent extends StatelessWidget {
     super.key,
     required this.calendar,
     required this.calendarCellOnTap,
+    required this.checkScheduleExist,
   });
 
+  /// 表示するカレンダー
   final List<Calendar> calendar;
+
+  /// スケジュールの存在を確認する
+  final Function(DateTime) checkScheduleExist;
+
+  /// カレンダーセルをクリック
   final Function(DateTime) calendarCellOnTap;
 
   @override
@@ -23,6 +30,7 @@ class CalendarCellListComponent extends StatelessWidget {
         return weekRow(
           context: context,
           calendarList: calendarListItem,
+          checkScheduleExist: checkScheduleExist,
           onTap: calendarCellOnTap,
         );
       }).toList(),
@@ -35,6 +43,9 @@ class CalendarCellListComponent extends StatelessWidget {
     /// 表示するカレンダーリスト
     required List<Calendar> calendarList,
 
+    /// スケジュールの存在を確認する
+    required Function(DateTime) checkScheduleExist,
+
     /// カレンダーのセルをタップ時の関数
     required Function(DateTime) onTap,
   }) {
@@ -42,10 +53,11 @@ class CalendarCellListComponent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: calendarList.map((calendarListItem) {
+        children: calendarList.map((calendarItem) {
           return _dateCell(
             context: context,
-            calendar: calendarListItem,
+            calendar: calendarItem,
+            scheduleExist: checkScheduleExist(calendarItem.date),
             onTap: onTap,
           );
         }).toList(),
@@ -58,6 +70,9 @@ class CalendarCellListComponent extends StatelessWidget {
 
     /// カレンダーデータ
     required Calendar calendar,
+
+    /// スケジュールが存在するか
+    required bool scheduleExist,
 
     /// カレンダーのセルをタップ時の関数
     required Function(DateTime) onTap,
@@ -98,8 +113,8 @@ class CalendarCellListComponent extends StatelessWidget {
           builder: (_) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                SchedulePage(),
+              children: [
+                SchedulePage(calendar),
               ],
             );
           },
@@ -122,7 +137,7 @@ class CalendarCellListComponent extends StatelessWidget {
             ),
 
             /// 予定が存在する
-            if (calendar.schedules.isNotEmpty)
+            if (scheduleExist)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(

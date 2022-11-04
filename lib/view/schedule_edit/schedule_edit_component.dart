@@ -112,7 +112,7 @@ class ScheduleEditPageComoponentState
         actions: [
           saveButton(
             clickable: isEdited,
-            save: () => widget.onSave,
+            save: () => widget.onSave(onPop),
           ),
         ],
       ),
