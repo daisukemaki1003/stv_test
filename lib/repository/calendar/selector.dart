@@ -17,7 +17,6 @@ final targetCalenderCellProvider = StateProvider<Calendar>((ref) {
   return Calendar(
     date: targetDate,
     enabled: false,
-    // schedules: scheduleNotifier.fetch(targetDate),
   );
 });
 

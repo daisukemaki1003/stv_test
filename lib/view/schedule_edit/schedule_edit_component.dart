@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/component/date_picker.dart';
-import 'package:stv_test/component/schedule_deletion_alert_dialog.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/routing/named_route.dart';
 

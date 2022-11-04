@@ -7,20 +7,6 @@ import 'package:stv_test/repository/schedule/state.dart';
 /// 選択されたスケジュール
 final targetScheduleProvider = StateProvider<ScheduleData?>((ref) => null);
 
-/// カレンダーで選択された日付のスケジュールリスト
-final selectedDateOfSchedulesProvider =
-    StateProvider<List<ScheduleData>>((ref) {
-  final scheduleNotifierState = ref.watch(scheduleNotifierProvider);
-  final selectedDateInCalendar = ref.watch(selectedDateInCalendarProvider);
-
-  final schedules = scheduleNotifierState.value;
-  if (schedules == null) return [];
-  return schedules.where((e) {
-    return selectedDateInCalendar.difference(e.from).inDays == 0 &&
-        selectedDateInCalendar.day == e.from.day;
-  }).toList();
-});
-
 /// 新規作成時の日付
 final targetNewScheduleDateProvider =
     StateProvider<DateTime>((ref) => DateTime.now());
