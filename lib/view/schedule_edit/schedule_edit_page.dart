@@ -21,6 +21,7 @@ class ScheduleEditPage extends ConsumerWidget {
     final scheduleNotifier = ref.watch(scheduleNotifierProvider.notifier);
 
     /// スケジュール State
+    final targetSchedule = ref.watch(targetScheduleProvider.state);
     final scheduleTitle = ref.watch(scheduleTitleProvider.state);
     final scheduleFrom = ref.watch(scheduleFromProvider.state);
     final scheduleTo = ref.watch(scheduleToProvider.state);
@@ -65,7 +66,8 @@ class ScheduleEditPage extends ConsumerWidget {
         content: "本当にこの日の予定を削除しますか？",
       );
       if (result != null && result) {
-        await scheduleNotifier.delete();
+        final targetSchedule = ref.watch(targetScheduleProvider.state);
+        await scheduleNotifier.delete(targetSchedule.state!);
         onPop();
       }
     }
@@ -85,6 +87,7 @@ class ScheduleEditPage extends ConsumerWidget {
       onBack: onBack,
       onSave: onSave,
       onDelete: isCreate ? null : onDelete,
+      clearParams: () => targetSchedule.state = null,
     );
   }
 }

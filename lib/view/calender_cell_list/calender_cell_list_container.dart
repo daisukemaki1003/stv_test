@@ -30,7 +30,14 @@ class CalendarCellListContainer extends ConsumerWidget {
           calendar: createCalendarList(selectedDate.year, selectedDate.month),
           checkScheduleExist: scheduleNotifier.exist,
           calendarCellOnTap: (date) {
-            selectedDateInCalendar.state = date;
+            final now = DateTime.now();
+            selectedDateInCalendar.state = DateTime(
+              date.year,
+              date.month,
+              date.day,
+              now.hour,
+              now.minute,
+            );
           },
         );
       },
