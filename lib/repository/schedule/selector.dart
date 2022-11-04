@@ -1,11 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/schedule.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
-import 'package:stv_test/repository/schedule/state.dart';
 
 /// 選択されたスケジュール
-final targetScheduleProvider = StateProvider<ScheduleData?>((ref) => null);
+final targetScheduleProvider =
+    StateProvider.autoDispose<ScheduleData?>((ref) => null);
 
 /// 新規作成時の日付
 final targetNewScheduleDateProvider =
@@ -36,7 +35,9 @@ final scheduleFromProvider = StateProvider.autoDispose<DateTime>((ref) {
 final scheduleToProvider = StateProvider.autoDispose<DateTime>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
   final targetDate = ref.watch(targetNewScheduleDateProvider);
-  return targetSchedule != null ? targetSchedule.to : targetDate;
+  return targetSchedule != null
+      ? targetSchedule.to
+      : targetDate.add(const Duration(hours: 1));
 });
 
 /// 終日
