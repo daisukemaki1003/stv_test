@@ -6,6 +6,8 @@ import 'package:stv_test/repository/schedule/selector.dart';
 import 'package:stv_test/routing/named_route.dart';
 import 'package:stv_test/view/schedule/schedule_component.dart';
 
+final currentPageIndexProvider = StateProvider<int>(((ref) => 999));
+
 class SchedulePage extends ConsumerWidget {
   const SchedulePage({super.key});
 
@@ -24,8 +26,13 @@ class SchedulePage extends ConsumerWidget {
     final targetNewScheduleDate =
         ref.watch(targetNewScheduleDateProvider.state);
 
+    /// スケジュールページインデックス
+    final currentPageIndex = ref.watch(currentPageIndexProvider.state);
+
     /// スケジュールカードをスワイプ
-    swipe(StateController<DateTime> state, bool isNext) {
+    changeDate(StateController<DateTime> state, int pageIndex) {
+      final isNext = currentPageIndex.state < pageIndex;
+      currentPageIndex.state = pageIndex;
       state.state = state.state.add(Duration(days: isNext ? 1 : -1));
     }
 
@@ -39,8 +46,9 @@ class SchedulePage extends ConsumerWidget {
         targetSchedule.state = value;
         context.push(editSchedulePath);
       },
-      onNextDay: () => swipe(targetDate, true),
-      onPrevDay: () => swipe(targetDate, false),
+      swipe: (pageIndex) => changeDate(targetDate, pageIndex),
+      // onNextDay: () => swipe(targetDate, true),
+      // onPrevDay: () => swipe(targetDate, false),
     );
   }
 }

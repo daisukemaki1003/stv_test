@@ -3,40 +3,30 @@ import 'package:intl/intl.dart';
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:stv_test/model/calendar.dart';
 
-class SchedulePageComponent extends StatefulWidget {
+class SchedulePageComponent extends StatelessWidget {
   const SchedulePageComponent({
     super.key,
     required this.calendarCell,
     required this.createSchedule,
     required this.updateSchedule,
-    required this.onPrevDay,
-    required this.onNextDay,
+    required this.swipe,
   });
 
   final Calendar calendarCell;
   final Function(DateTime) createSchedule;
   final Function(ScheduleData) updateSchedule;
 
-  final Function() onPrevDay;
-  final Function() onNextDay;
+  final Function(int) swipe;
 
-  @override
-  State<SchedulePageComponent> createState() => SchedulePageComponentState();
-}
-
-class SchedulePageComponentState extends State<SchedulePageComponent> {
   @override
   Widget build(BuildContext context) {
-    /// PageViewのインデックス
-    int pageIndex = 0;
-
     /// 表示するページ
     final pages = [
       scheduleCard(
         context: context,
-        cell: widget.calendarCell,
-        create: widget.createSchedule,
-        update: widget.updateSchedule,
+        cell: calendarCell,
+        create: createSchedule,
+        update: updateSchedule,
       )
     ];
 
@@ -49,18 +39,9 @@ class SchedulePageComponentState extends State<SchedulePageComponent> {
         itemBuilder: (context, index) {
           return pages[index % pages.length];
         },
-        onPageChanged: (index) {
-          /// スワイプに応じて日付を更新
-          if (pageIndex < index) {
-            widget.onNextDay();
-          } else {
-            widget.onPrevDay();
-          }
 
-          setState(() {
-            pageIndex = index;
-          });
-        },
+        /// スワイプに応じて日付を更新
+        onPageChanged: swipe,
       ),
     );
   }
@@ -78,7 +59,7 @@ class SchedulePageComponentState extends State<SchedulePageComponent> {
     required void Function(ScheduleData) update,
   }) {
     /// 日付フォーマット
-    final dateFormat = DateFormat('yyyy/M/d');
+    final dateFormat = DateFormat('yyyy/MM/dd');
     final weekText = DateFormat.E('ja').format(cell.date);
 
     return Padding(
