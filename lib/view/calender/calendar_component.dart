@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
 import 'package:stv_test/constraints/font.dart';
@@ -10,10 +11,14 @@ class CalendarPageComponent extends StatelessWidget {
     super.key,
     required this.targetDate,
     required this.targetDateOnChange,
+    required this.onSwipe,
+    required this.pageIndex,
   });
 
   final DateTime targetDate;
   final Function(DateTime) targetDateOnChange;
+  final Function(int) onSwipe;
+  final int pageIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +37,7 @@ class CalendarPageComponent extends StatelessWidget {
               children: [
                 /// 今日ボタン
                 todayButton(() {
-                  final now = DateTime.now();
-                  targetDateOnChange(now);
+                  targetDateOnChange(DateTime.now());
                 }),
 
                 /// 月選択ピッカー
@@ -54,9 +58,13 @@ class CalendarPageComponent extends StatelessWidget {
           /// カレンダーセル
           Expanded(
             child: PageView.builder(
+              controller: PageController(initialPage: 999),
               itemBuilder: (BuildContext context, int index) {
-                return const CalendarCellListContainer();
+                final date =
+                    Jiffy(targetDate).add(months: index - pageIndex).dateTime;
+                return CalendarCellListContainer(date);
               },
+              onPageChanged: onSwipe,
             ),
           ),
         ],

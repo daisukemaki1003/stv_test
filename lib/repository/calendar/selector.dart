@@ -1,14 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/model/calendar.dart';
-import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/utils/create_calendar_list.dart';
 
 /// カレンダーの選択された年月
 final selectedYearAndMonthInCalendarProvider =
     StateProvider<DateTime>((ref) => DateTime.now());
-
-/// [targetDateProvider]の状態を書き換えるPageViewを管理
-final pageIndexProvider = StateProvider<int>((ref) => 999);
 
 /// 選択されたカレンダーセルの日付
 final selectedDateInCalendarProvider =
