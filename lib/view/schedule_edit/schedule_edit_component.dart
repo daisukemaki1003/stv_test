@@ -1,42 +1,95 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
-import 'package:stv_test/repository/schedule/selector.dart';
-import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/routing/named_route.dart';
 
-class ScheduleEditPage extends ConsumerWidget {
-  const ScheduleEditPage({
+class ScheduleEditPageComoponent extends StatefulWidget {
+  const ScheduleEditPageComoponent({
     super.key,
+    required this.isCreate,
     required this.title,
-    required this.onCreate,
+    required this.from,
+    required this.to,
+    required this.isAllDay,
+    required this.comment,
+    required this.titleOnChanged,
+    required this.fromOnChanged,
+    required this.toOnChanged,
+    required this.isAllDayOnChanged,
+    required this.commentOnChanged,
+    required this.onBack,
+    required this.onSave,
+    required this.onDelete,
   });
 
+  /// Mode
+  final bool isCreate;
+
+  /// State
   final String title;
-  final bool onCreate;
+  final DateTime from;
+  final DateTime to;
+  final bool isAllDay;
+  final String comment;
+
+  /// State変更時処理
+  final Function(String) titleOnChanged;
+  final Function(DateTime) fromOnChanged;
+  final Function(DateTime) toOnChanged;
+  final Function(bool) isAllDayOnChanged;
+  final Function(String) commentOnChanged;
+
+  /// 戻るボタンタップイベント
+  /// [isEdit] 編集したかどうか
+  /// [pop] 戻る
+  final Function(bool isEdit, Function pop) onBack;
+
+  /// 保存ボタンイベント
+  /// [pop] 戻る
+  final Function(Function pop) onSave;
+
+  /// 削除ボタンイベント
+  /// [pop] 戻る
+  final Function(Function pop)? onDelete;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    /// スケジュール Notifier
-    final scheduleNotifier = ref.watch(scheduleNotifierProvider.notifier);
+  State<ScheduleEditPageComoponent> createState() =>
+      ScheduleEditPageComoponentState();
+}
 
-    /// スケジュール State
-    final scheduleTitle = ref.watch(scheduleTitleProvider.state);
-    final scheduleFrom = ref.watch(scheduleFromProvider.state);
-    final scheduleTo = ref.watch(scheduleToProvider.state);
-    final scheduleIsAllDay = ref.watch(scheduleIsAllDayProvider.state);
-    final scheduleComment = ref.watch(scheduleCommentProvider.state);
+///
+///
+/// ページステート
+class ScheduleEditPageComoponentState
+    extends State<ScheduleEditPageComoponent> {
+  /// 編集したか
+  bool isEdited = false;
 
-    /// 編集したかどうか
-    final isEdited = ref.watch(isEditedProvider.state);
+  void _editing() {
+    if (widget.isCreate) {
+      setState(() {
+        isEdited = widget.title.isNotEmpty && widget.comment.isNotEmpty;
+      });
+    } else {
+      setState(() {
+        isEdited = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    /// カレンダーページに戻る
+    onPop() {
+      if (!mounted) return;
+      context.go(calendarPath);
+    }
 
     /// 日付フォーマット
     final DateFormat dateFormat;
-    if (scheduleIsAllDay.state) {
+    if (widget.isAllDay) {
       dateFormat = DateFormat('yyyy-MM-dd'); // 終日
     } else {
       dateFormat = DateFormat('yyyy-MM-dd HH:mm');
@@ -45,35 +98,21 @@ class ScheduleEditPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: defaultColor,
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
         elevation: 0,
 
         /// 戻るボタン
-        leading: popButton(
+        leading: backButton(
           context: context,
-          onPressed: () async {
-            /// 編集時じゃない
-            if (!isEdited.state) context.go(calendarPath);
-            final result = await discardEditsDialog(context);
-            if (result != null && result) context.go(calendarPath);
-            // scheduleNotifier.clear();
-            isEdited.state = false;
-          },
+          onPressed: () => widget.onBack(isEdited, onPop),
         ),
 
         /// 保存ボタン
         actions: [
           saveButton(
-            clickable: onCreate
-                ? scheduleTitle.state.isNotEmpty &&
-                    scheduleComment.state.isNotEmpty
-                : isEdited.state,
-            save: () {
-              context.go(calendarPath);
-              onCreate ? scheduleNotifier.create() : scheduleNotifier.update();
-              isEdited.state = false;
-            },
-          )
+            clickable: isEdited,
+            save: () => widget.onSave(onPop),
+          ),
         ],
       ),
       body: GestureDetector(
@@ -92,12 +131,13 @@ class ScheduleEditPage extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 30),
                   child: titleInputField(
-                      context: context,
-                      title: scheduleTitle.state,
-                      onChanged: (value) {
-                        scheduleTitle.state = value;
-                        isEdited.state = true;
-                      }),
+                    context: context,
+                    title: widget.title,
+                    onChanged: (value) {
+                      widget.titleOnChanged(value);
+                      _editing();
+                    },
+                  ),
                 ),
 
                 Container(
@@ -106,34 +146,31 @@ class ScheduleEditPage extends ConsumerWidget {
                     children: [
                       /// 終日選択ボタン
                       allDaySelectionButton(
-                        isAllDay: scheduleIsAllDay.state,
-                        onChanged: (value) {
-                          scheduleIsAllDay.state = value;
-                          isEdited.state = true;
-                        },
-                      ),
+                          isAllDay: widget.isAllDay,
+                          onChanged: (value) {
+                            widget.isAllDayOnChanged(value);
+                            _editing();
+                          }),
 
                       /// 開始日時ピッカー
                       datePickerTile(
                         context: context,
                         title: "開始",
-                        selectedDate: scheduleFrom.state,
-                        onChange: (date) {
-                          /// 終日
-                          if (scheduleIsAllDay.state) {
-                            scheduleFrom.state = date;
-                            if (scheduleTo.state.isBefore(date)) {
-                              scheduleTo.state = date;
+                        selectedDate: widget.from,
+                        onChange: (value) {
+                          widget.fromOnChanged(value);
+                          if (widget.isAllDay) {
+                            if (widget.to.isBefore(value)) {
+                              widget.toOnChanged(value);
                             }
                           } else {
-                            /// 終日じゃない
-                            scheduleFrom.state = date;
-                            if (scheduleTo.state.isBefore(date)) {
-                              scheduleTo.state =
-                                  date.add(const Duration(hours: 1));
+                            if (widget.to.isBefore(value)) {
+                              widget.toOnChanged(
+                                value.add(const Duration(hours: 1)),
+                              );
                             }
                           }
-                          isEdited.state = true;
+                          _editing();
                         },
                         dateFormat: dateFormat,
                       ),
@@ -142,10 +179,10 @@ class ScheduleEditPage extends ConsumerWidget {
                       datePickerTile(
                         context: context,
                         title: "終了",
-                        selectedDate: scheduleTo.state,
-                        onChange: (date) {
-                          scheduleTo.state = date;
-                          isEdited.state = true;
+                        selectedDate: widget.to,
+                        onChange: (value) {
+                          widget.toOnChanged(value);
+                          _editing();
                         },
                         dateFormat: dateFormat,
                       ),
@@ -157,25 +194,21 @@ class ScheduleEditPage extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: commentInputField(
-                      comment: scheduleComment.state,
-                      onChanged: (value) {
-                        scheduleComment.state = value;
-                        isEdited.state = true;
-                      }),
+                    comment: widget.comment,
+                    onChanged: (value) {
+                      widget.commentOnChanged(value);
+                      _editing();
+                    },
+                  ),
                 ),
 
                 /// 削除ボタン
-                if (!onCreate)
+                if (widget.onDelete != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
                     child: deleteButton(
                       context: context,
-                      delete: () async {
-                        Navigator.of(context).pop();
-                        context.go(calendarPath);
-                        await scheduleNotifier.delete();
-                        isEdited.state = false;
-                      },
+                      delete: () async => await widget.onDelete!(onPop),
                     ),
                   )
               ],
@@ -228,7 +261,7 @@ class ScheduleEditPage extends ConsumerWidget {
     );
   }
 
-  Widget popButton({
+  Widget backButton({
     required BuildContext context,
     required Function() onPressed,
   }) {
@@ -265,60 +298,11 @@ class ScheduleEditPage extends ConsumerWidget {
           backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 20),
         ),
+        onPressed: delete,
         child: const Text(
           'この予定を削除',
           style: TextStyle(color: Colors.red),
         ),
-        onPressed: () {
-          _showAlertDialog(context, delete);
-        },
-      ),
-    );
-  }
-
-  Future<bool?> discardEditsDialog(BuildContext context) {
-    return showCupertinoModalPopup<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoActionSheet(
-          actions: <Widget>[
-            CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text("編集を破棄"),
-            )
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text("キャンセル"),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showAlertDialog(BuildContext context, Function() delete) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: const Text('予定の削除'),
-        content: const Text('本当にこの日の予定を削除しますか？'),
-        actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            textStyle: const TextStyle(color: Colors.blue),
-            child: const Text('キャンセル'),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: delete,
-            textStyle: const TextStyle(color: Colors.blue),
-            child: const Text('削除'),
-          )
-        ],
       ),
     );
   }

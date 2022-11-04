@@ -1,7 +1,6 @@
 import 'package:stv_test/data_source/schedule.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/data_source/module.dart';
-import 'package:stv_test/repository/calendar/state.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 
 /// プロバイダー
@@ -24,37 +23,37 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
 
   Future<void> initialize() async => await fetchAll();
 
-  create() async {
-    final newSchedule = ref.watch(newScheduleProvider);
-    await _dataSource.createSchedule(newSchedule);
+  Future create(ScheduleCompanion schedule) async {
+    await _dataSource.createSchedule(schedule);
     ref.refresh(scheduleNotifierProvider);
   }
 
-  update() async {
-    final newSchedule = ref.watch(editScheduleProvider);
-    await _dataSource.updateSchedule(newSchedule);
+  Future update(ScheduleData schedule) async {
+    await _dataSource.updateSchedule(schedule);
+    ref.refresh(scheduleNotifierProvider);
   }
 
-  delete() async {
+  Future delete() async {
     final target = ref.watch(targetScheduleProvider);
     await _dataSource.deleteSchedule(target!.id);
     ref.refresh(scheduleNotifierProvider);
-    ref.refresh(calendarNotifierProvider);
   }
 
-  fetchAll() async {
-    final schedules = await _dataSource.fetchAll();
-    state = AsyncValue.data(schedules);
+  Future fetchAll() async {
+    state = await AsyncValue.guard(() async {
+      final schedules = await _dataSource.fetchAll();
+      return schedules;
+    });
   }
 
-  List<ScheduleData> fetch(DateTime date) {
-    if (state.value != null) {
-      return state.value!.where(
-        (e) {
-          return date.difference(e.from).inDays == 0 && date.day == e.from.day;
-        },
-      ).toList();
+  bool exist(DateTime date) {
+    final data = state.value;
+    if (data == null) return false;
+
+    for (var schedule in data) {
+      if (date.difference(schedule.from).inDays == 0 &&
+          date.day == schedule.from.day) return true;
     }
-    return List.empty();
+    return false;
   }
 }

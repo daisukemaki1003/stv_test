@@ -12,7 +12,6 @@ List<Calendar> prevPaddingDays(int year, int month) {
       Calendar(
         date: DateTime(year, month - 1, day),
         enabled: false,
-        schedules: [],
         // schedules: List.empty(),
       ),
     );
@@ -28,7 +27,6 @@ List<Calendar> currentDays(int year, int month) {
     calendarList.add(Calendar(
       date: DateTime(year, month, day),
       enabled: true,
-      schedules: [],
       // schedules: List.empty(),
     ));
   }
@@ -42,7 +40,6 @@ List<Calendar> nextPaddingDays(int year, int month, prevList, currentList) {
     list.add(Calendar(
       date: DateTime(year, month + 1, day),
       enabled: false,
-      schedules: [],
       // schedules: List.empty(),
     ));
   }

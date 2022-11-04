@@ -3,12 +3,10 @@ import 'package:stv_test/data_source/schedule.dart';
 class Calendar {
   final DateTime date;
   final bool enabled;
-  final List<ScheduleData> schedules;
 
   Calendar({
     required this.date,
     required this.enabled,
-    required this.schedules,
   });
 
   bool isThatDay(DateTime thatDay) =>
@@ -22,6 +20,5 @@ class Calendar {
       Calendar(
         date: date ?? this.date,
         enabled: enabled ?? this.enabled,
-        schedules: schedules ?? this.schedules,
       );
 }
