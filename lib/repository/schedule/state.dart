@@ -33,9 +33,8 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
     ref.refresh(scheduleNotifierProvider);
   }
 
-  Future delete() async {
-    final target = ref.watch(targetScheduleProvider);
-    await _dataSource.deleteSchedule(target!.id);
+  Future delete(ScheduleData schedule) async {
+    await _dataSource.deleteSchedule(schedule.id);
     ref.refresh(scheduleNotifierProvider);
   }
 
