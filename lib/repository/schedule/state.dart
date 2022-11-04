@@ -40,8 +40,10 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
   }
 
   Future fetchAll() async {
-    final schedules = await _dataSource.fetchAll();
-    state = AsyncValue.data(schedules);
+    state = await AsyncValue.guard(() async {
+      final schedules = await _dataSource.fetchAll();
+      return schedules;
+    });
   }
 
   bool exist(DateTime date) {

@@ -209,7 +209,7 @@ class ScheduleEditPageComoponentState
                     padding: const EdgeInsets.only(top: 30),
                     child: deleteButton(
                       context: context,
-                      delete: () => widget.onDelete!(onPop),
+                      delete: () async => await widget.onDelete!(onPop),
                     ),
                   )
               ],
@@ -299,17 +299,11 @@ class ScheduleEditPageComoponentState
           backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 20),
         ),
+        onPressed: delete,
         child: const Text(
           'この予定を削除',
           style: TextStyle(color: Colors.red),
         ),
-        onPressed: () {
-          deletionAlertDialog(
-            context: context,
-            title: "予定の削除",
-            content: "本当にこの日の予定を削除しますか？",
-          );
-        },
       ),
     );
   }

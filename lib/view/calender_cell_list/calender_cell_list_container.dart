@@ -25,14 +25,16 @@ class CalendarCellListContainer extends ConsumerWidget {
       loading: CircularProgressIndicator.new,
       data: (data) {
         /// スケジュールセット
-        // calendarNotifier.setSchedule(data);
-        return CalendarCellListComponent(
-          calendar: thisMonthCalender,
-          checkScheduleExist: scheduleNotifier.exist,
-          calendarCellOnTap: (date) {
-            selectedDateInCalendar.state = date;
-          },
+        return Center(
+          child: Text("test"),
         );
+        // return CalendarCellListComponent(
+        //   calendar: thisMonthCalender,
+        //   checkScheduleExist: scheduleNotifier.exist,
+        //   calendarCellOnTap: (date) {
+        //     selectedDateInCalendar.state = date;
+        //   },
+        // );
       },
     );
   }

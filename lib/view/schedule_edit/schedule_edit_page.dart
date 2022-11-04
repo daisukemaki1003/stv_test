@@ -30,6 +30,46 @@ class ScheduleEditPage extends ConsumerWidget {
     /// State更新
     write<T>(StateController<T> state, T value) => state.state = value;
 
+    /// 戻る
+    onBack(bool isEdit, Function onPop) async {
+      if (!isEdit) {
+        onPop();
+      } else {
+        final result = await discardEditsDialog(
+          context: context,
+          actionText: "編集を破棄",
+        );
+        if (result != null && result) onPop();
+      }
+    }
+
+    /// 保存
+    onSave(onPop) async {
+      if (isCreate) {
+        /// 作成
+        final newSchedule = ref.watch(newScheduleProvider.state);
+        await scheduleNotifier.create(newSchedule.state);
+      } else {
+        /// 更新
+        final editSchedule = ref.watch(editScheduleProvider.state);
+        await scheduleNotifier.update(editSchedule.state);
+      }
+      onPop();
+    }
+
+    /// 削除
+    onDelete(onPop) async {
+      final result = await deletionAlertDialog(
+        context: context,
+        title: "予定の削除",
+        content: "本当にこの日の予定を削除しますか？",
+      );
+      if (result != null && result) {
+        await scheduleNotifier.delete();
+        onPop();
+      }
+    }
+
     return ScheduleEditPageComoponent(
       isCreate: isCreate,
       title: scheduleTitle.state,
@@ -42,42 +82,9 @@ class ScheduleEditPage extends ConsumerWidget {
       toOnChanged: (value) => write(scheduleTo, value),
       isAllDayOnChanged: (value) => write(scheduleIsAllDay, value),
       commentOnChanged: (value) => write(scheduleComment, value),
-      onBack: (isEdit, pop) async {
-        if (isEdit) {
-          pop();
-        } else {
-          final result = await discardEditsDialog(
-            context: context,
-            actionText: "編集を破棄",
-          );
-          if (result != null && result) pop();
-        }
-      },
-      onSave: (pop) async {
-        if (isCreate) {
-          /// 作成
-          final newSchedule = ref.watch(newScheduleProvider.state);
-          await scheduleNotifier.create(newSchedule.state);
-        } else {
-          /// 更新
-          final editSchedule = ref.watch(editScheduleProvider.state);
-          await scheduleNotifier.update(editSchedule.state);
-        }
-        pop();
-      },
-      onDelete: isCreate
-          ? null
-          : (pop) async {
-              final result = await deletionAlertDialog(
-                context: context,
-                title: "予定の削除",
-                content: "本当にこの日の予定を削除しますか？",
-              );
-              if (result != null && result) {
-                await scheduleNotifier.delete();
-                pop();
-              }
-            },
+      onBack: onBack,
+      onSave: onSave,
+      onDelete: isCreate ? null : onDelete,
     );
   }
 }

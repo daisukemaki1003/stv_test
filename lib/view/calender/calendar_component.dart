@@ -1,21 +1,138 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stv_test/repository/calendar/selector.dart';
-import 'package:stv_test/view/calender/calendar_page.dart';
+import 'package:intl/intl.dart';
+import 'package:stv_test/component/date_picker.dart';
+import 'package:stv_test/constraints/color.dart';
+import 'package:stv_test/constraints/font.dart';
+import 'package:stv_test/view/calender_cell_list/calender_cell_list_container.dart';
 
-class CalendarPage extends ConsumerWidget {
-  const CalendarPage({super.key});
+class CalendarPageComponent extends StatelessWidget {
+  const CalendarPageComponent({
+    super.key,
+    required this.targetDate,
+    required this.targetDateOnChange,
+  });
+
+  final DateTime targetDate;
+  final Function(DateTime) targetDateOnChange;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedYearAndMonthInCalendar =
-        ref.watch(selectedYearAndMonthInCalendarProvider.state);
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("カレンダー"),
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /// 今日ボタン
+                todayButton(() {
+                  final now = DateTime.now();
+                  targetDateOnChange(now);
+                }),
 
-    return CalendarPageComponent(
-      targetDate: selectedYearAndMonthInCalendar.state,
-      targetDateOnChange: (DateTime date) {
-        selectedYearAndMonthInCalendar.state = date;
-      },
+                /// 月選択ピッカー
+                monthPicker(
+                  context: context,
+                  date: targetDate,
+                  onChangeed: targetDateOnChange,
+                ),
+
+                Container(),
+              ],
+            ),
+          ),
+
+          /// 週ヘッダー
+          weekHeader(),
+
+          /// カレンダーセル
+          Expanded(
+            child: PageView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return const CalendarCellListContainer();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget weekHeader() {
+    const fontSize = 12.0;
+    const defaultWeekHeaderTextStyle = TextStyle(fontSize: fontSize);
+    const saturdayWeekHeaderTextStyle =
+        TextStyle(fontSize: fontSize, color: saturdayTextColor);
+    const sundayWeekHeaderTextStyle =
+        TextStyle(fontSize: fontSize, color: sundayTextColor);
+
+    return Container(
+      color: weekHeaderColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: const [
+          Text(mon, style: defaultWeekHeaderTextStyle),
+          Text(tue, style: defaultWeekHeaderTextStyle),
+          Text(wed, style: defaultWeekHeaderTextStyle),
+          Text(thu, style: defaultWeekHeaderTextStyle),
+          Text(fri, style: defaultWeekHeaderTextStyle),
+          Text(sat, style: saturdayWeekHeaderTextStyle),
+          Text(sun, style: sundayWeekHeaderTextStyle),
+        ],
+      ),
+    );
+  }
+
+  Widget monthPicker({
+    required BuildContext context,
+    required DateTime date,
+    required Function(DateTime) onChangeed,
+  }) {
+    return Row(
+      children: [
+        Text(
+          DateFormat('yyyy年MM月').format(date),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+        IconButton(
+          onPressed: () async {
+            final result = await datePicker(
+              context: context,
+              isAllDay: true,
+              date: targetDate,
+            );
+            if (result != null) {
+              onChangeed(result);
+            }
+          },
+          icon: const Icon(Icons.arrow_drop_down),
+        ),
+      ],
+    );
+  }
+
+  Widget todayButton(Function() onPressed) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
+      child: const Text(
+        "今日",
+        style: TextStyle(color: Colors.black),
+      ),
     );
   }
 }

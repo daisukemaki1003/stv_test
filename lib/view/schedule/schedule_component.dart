@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/data_source/schedule.dart';
-import 'package:stv_test/model/calendar.dart';
 
 class SchedulePageComponent extends StatelessWidget {
   const SchedulePageComponent({
@@ -9,42 +8,35 @@ class SchedulePageComponent extends StatelessWidget {
     required this.selectedDate,
     required this.createSchedule,
     required this.updateSchedule,
-    required this.swipe,
-    required this.schedules,
+    required this.fetchSchedule,
   });
 
   final DateTime selectedDate;
-  final List<ScheduleData> schedules;
   final Function(DateTime) createSchedule;
   final Function(ScheduleData) updateSchedule;
-
-  /// カードをスワイプした時の処理
-  final Function(int) swipe;
+  final Function(DateTime) fetchSchedule;
 
   @override
   Widget build(BuildContext context) {
-    /// 表示するページ
-    final pages = [
-      scheduleCard(
-        context: context,
-        selectedDate: selectedDate,
-        create: createSchedule,
-        update: updateSchedule,
-      )
-    ];
-
+    int initialPage = 999;
+    final controller =
+        PageController(viewportFraction: 0.9, initialPage: initialPage);
     return Container(
       height: 600,
       alignment: Alignment.bottomCenter,
       color: Colors.transparent,
       child: PageView.builder(
-        controller: PageController(viewportFraction: 0.9, initialPage: 999),
-        itemBuilder: (context, index) {
-          return pages[index % pages.length];
+        controller: controller,
+        itemBuilder: (_, index) {
+          final date = selectedDate.add(Duration(days: index - initialPage));
+          return scheduleCard(
+            context: context,
+            selectedDate: date,
+            create: createSchedule,
+            update: updateSchedule,
+            schedules: fetchSchedule(date),
+          );
         },
-
-        /// スワイプに応じて日付を更新
-        onPageChanged: swipe,
       ),
     );
   }
@@ -56,10 +48,11 @@ class SchedulePageComponent extends StatelessWidget {
     required DateTime selectedDate,
 
     /// 新規作成
-    required void Function(DateTime) create,
+    required Function(DateTime) create,
 
     /// 編集
-    required void Function(ScheduleData) update,
+    required Function(ScheduleData) update,
+    required List<ScheduleData> schedules,
   }) {
     /// 日付フォーマット
     final dateFormat = DateFormat('yyyy/MM/dd');
@@ -110,7 +103,7 @@ class SchedulePageComponent extends StatelessWidget {
                     .toList()
                     .map((e) => scheduleTile(
                           schedule: e,
-                          onTap: update,
+                          onTap: () => update(e),
                         ))
                     .toList(),
               ),
@@ -122,7 +115,7 @@ class SchedulePageComponent extends StatelessWidget {
                   .toList()
                   .map((e) => scheduleTile(
                         schedule: e,
-                        onTap: update,
+                        onTap: () => update(e),
                       ))
                   .toList(),
             ),
@@ -134,14 +127,14 @@ class SchedulePageComponent extends StatelessWidget {
 
   Widget scheduleTile({
     required ScheduleData schedule,
-    required Function(ScheduleData) onTap,
+    required Function() onTap,
   }) {
     final dateFormat = DateFormat('HH:mm');
 
     return Column(
       children: [
         InkWell(
-          onTap: () => onTap(schedule),
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Row(
