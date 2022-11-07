@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:stv_test/repository/calendar/selector.dart';
 import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/utils/create_calendar_list.dart';
