@@ -3,7 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
-import 'package:stv_test/routing/named_route.dart';
+import 'package:stv_test/constraints/text.dart';
+import 'package:stv_test/constraints/named_route.dart';
 
 class ScheduleEditPageComoponent extends StatefulWidget {
   const ScheduleEditPageComoponent({
@@ -95,9 +96,9 @@ class ScheduleEditPageComoponentState
     /// 日付フォーマット
     final DateFormat dateFormat;
     if (widget.isAllDay) {
-      dateFormat = DateFormat('yyyy-MM-dd'); // 終日
+      dateFormat = kScheduleEditPageDateFormatForAllDay; // 終日
     } else {
-      dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+      dateFormat = kScheduleEditPageDateFormat;
     }
 
     return Scaffold(
@@ -305,7 +306,7 @@ class ScheduleEditPageComoponentState
         ),
         onPressed: delete,
         child: const Text(
-          'この予定を削除',
+          kScheduleEditPageDeleteButtonText,
           style: TextStyle(color: Colors.red),
         ),
       ),

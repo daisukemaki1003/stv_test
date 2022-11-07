@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stv_test/component/discard_edits_dialog.dart';
 import 'package:stv_test/component/schedule_deletion_alert_dialog.dart';
+import 'package:stv_test/constraints/text.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 import 'package:stv_test/repository/schedule/state.dart';
 import 'package:stv_test/view/schedule_edit/schedule_edit_component.dart';
@@ -38,7 +39,7 @@ class ScheduleEditPage extends ConsumerWidget {
       } else {
         final result = await discardEditsDialog(
           context: context,
-          actionText: "編集を破棄",
+          actionText: kScheduleEditPageDiscardEditsText,
         );
         if (result != null && result) onPop();
       }
@@ -62,8 +63,8 @@ class ScheduleEditPage extends ConsumerWidget {
     onDelete(onPop) async {
       final result = await deletionAlertDialog(
         context: context,
-        title: "予定の削除",
-        content: "本当にこの日の予定を削除しますか？",
+        title: kScheduleEditPageDeleteEventTitle,
+        content: kScheduleEditPageDeleteEventContent,
       );
       if (result != null && result) {
         final targetSchedule = ref.watch(targetScheduleProvider.state);

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:stv_test/component/date_picker.dart';
 import 'package:stv_test/constraints/color.dart';
-import 'package:stv_test/constraints/font.dart';
+import 'package:stv_test/constraints/text.dart';
 import 'package:stv_test/view/calender_cell_list/calender_cell_list_container.dart';
 
 class CalendarPageComponent extends StatelessWidget {
@@ -25,7 +24,7 @@ class CalendarPageComponent extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("カレンダー"),
+        title: const Text(kCalenderPageTitle),
         elevation: 0,
       ),
       body: Column(
@@ -105,7 +104,7 @@ class CalendarPageComponent extends StatelessWidget {
     return Row(
       children: [
         Text(
-          DateFormat('yyyy年MM月').format(date),
+          kCalenderPageWeekHeaderDateFormat.format(date),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -138,7 +137,7 @@ class CalendarPageComponent extends StatelessWidget {
         ),
       ),
       child: const Text(
-        "今日",
+        kCalenderPageTodayButtonText,
         style: TextStyle(color: Colors.black),
       ),
     );

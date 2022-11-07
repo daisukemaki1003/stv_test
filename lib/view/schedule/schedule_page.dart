@@ -5,7 +5,7 @@ import 'package:stv_test/model/calendar.dart';
 import 'package:stv_test/repository/calendar/selector.dart';
 import 'package:stv_test/repository/schedule/selector.dart';
 import 'package:stv_test/repository/schedule/state.dart';
-import 'package:stv_test/routing/named_route.dart';
+import 'package:stv_test/constraints/named_route.dart';
 import 'package:stv_test/view/schedule/schedule_component.dart';
 
 class SchedulePage extends ConsumerWidget {

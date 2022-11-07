@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:stv_test/constraints/text.dart';
 import 'package:stv_test/data_source/schedule.dart';
 
 class SchedulePageComponent extends StatelessWidget {
@@ -55,8 +56,8 @@ class SchedulePageComponent extends StatelessWidget {
     required List<ScheduleData> schedules,
   }) {
     /// 日付フォーマット
-    final dateFormat = DateFormat('yyyy/MM/dd');
-    final weekText = DateFormat.E('ja').format(selectedDate);
+    final dateFormat = kSchedulePageLabelDateFormat;
+    final weekText = kSchedulePageWeekLabelDateFormat.format(selectedDate);
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
@@ -129,7 +130,7 @@ class SchedulePageComponent extends StatelessWidget {
     required ScheduleData schedule,
     required Function() onTap,
   }) {
-    final dateFormat = DateFormat('HH:mm');
+    final dateFormat = kSchedulePageEstimatedTimeDateFormat;
 
     return Column(
       children: [
@@ -142,7 +143,7 @@ class SchedulePageComponent extends StatelessWidget {
                 SizedBox(
                   width: 45,
                   child: schedule.isAllDay
-                      ? const Center(child: Text("終日"))
+                      ? const Center(child: Text(kSchedulePageAllDayText))
                       : Column(
                           children: [
                             Text(dateFormat.format(schedule.from)),
@@ -178,7 +179,7 @@ class SchedulePageComponent extends StatelessWidget {
   unscheduledCard() {
     return const Expanded(
       child: Center(
-        child: Text("予定がありません"),
+        child: Text(kSchedulePageNoPlanText),
       ),
     );
   }

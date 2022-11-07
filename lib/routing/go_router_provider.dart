@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stv_test/routing/named_route.dart';
+import 'package:stv_test/constraints/named_route.dart';
 import 'package:stv_test/view/calender/calendar_page.dart';
 import 'package:stv_test/view/error.dart';
 import 'package:stv_test/view/schedule_edit/schedule_edit_page.dart';
