@@ -22,7 +22,7 @@ class ScheduleEditPage extends ConsumerWidget {
     final scheduleNotifier = ref.watch(scheduleNotifierProvider.notifier);
 
     /// スケジュール State
-    final targetSchedule = ref.watch(targetScheduleProvider.state);
+    // final targetSchedule = ref.watch(targetScheduleProvider.state);
     final scheduleTitle = ref.watch(scheduleTitleProvider.state);
     final scheduleFrom = ref.watch(scheduleFromProvider.state);
     final scheduleTo = ref.watch(scheduleToProvider.state);
@@ -53,10 +53,11 @@ class ScheduleEditPage extends ConsumerWidget {
         await scheduleNotifier.create(newSchedule.state);
       } else {
         /// 更新
+
         final editSchedule = ref.watch(editScheduleProvider.state);
         await scheduleNotifier.update(editSchedule.state);
       }
-      onPop();
+      await onPop();
     }
 
     /// 削除
@@ -89,7 +90,6 @@ class ScheduleEditPage extends ConsumerWidget {
       onBack: onBack,
       onSave: onSave,
       onDelete: isCreate ? null : onDelete,
-      clearParams: () => targetSchedule.state = null,
     );
   }
 }

@@ -45,6 +45,7 @@ class SchedulePage extends ConsumerWidget {
           return date.difference(e.from).inDays == 0 && date.day == e.from.day;
         }).toList();
       },
+      initParams: () => targetSchedule.state = null,
     );
   }
 }

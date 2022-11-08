@@ -15,7 +15,11 @@ final targetNewScheduleDateProvider =
 /// ID
 final scheduleIdProvider = StateProvider.autoDispose<int?>((ref) {
   final targetSchedule = ref.watch(targetScheduleProvider);
-  return targetSchedule?.id;
+  if (targetSchedule != null) {
+    return targetSchedule.id;
+  }
+  print("nullを返却");
+  return null;
 });
 
 /// タイトル
@@ -77,6 +81,11 @@ final editScheduleProvider = StateProvider.autoDispose<ScheduleData>((ref) {
   final to = ref.watch(scheduleToProvider);
   final isAllDay = ref.watch(scheduleIsAllDayProvider);
   final comment = ref.watch(scheduleCommentProvider);
+
+  print("object");
+  print("object");
+  print("object");
+  print("object");
 
   return ScheduleData(
     id: id!,

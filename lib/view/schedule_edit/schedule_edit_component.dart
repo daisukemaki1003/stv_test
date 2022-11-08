@@ -18,7 +18,6 @@ class ScheduleEditPageComoponent extends StatefulWidget {
     required this.onBack,
     required this.onSave,
     required this.onDelete,
-    required this.clearParams,
     required this.scheduleTitle,
     required this.scheduleFrom,
     required this.scheduleTo,
@@ -59,9 +58,6 @@ class ScheduleEditPageComoponent extends StatefulWidget {
   /// [pop] 戻る
   final Function(Function pop)? onDelete;
 
-  /// データクリア
-  final Function clearParams;
-
   @override
   State<ScheduleEditPageComoponent> createState() =>
       ScheduleEditPageComoponentState();
@@ -91,8 +87,7 @@ class ScheduleEditPageComoponentState
   @override
   Widget build(BuildContext context) {
     /// カレンダーページに戻る
-    onPop() {
-      widget.clearParams();
+    onPop() async {
       if (!mounted) return;
       context.go(calendarPath);
     }

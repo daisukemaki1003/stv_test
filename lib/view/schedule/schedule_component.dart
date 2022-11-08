@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:stv_test/constraints/text.dart';
 import 'package:stv_test/data_source/schedule.dart';
 
@@ -10,12 +9,14 @@ class SchedulePageComponent extends StatelessWidget {
     required this.createSchedule,
     required this.updateSchedule,
     required this.fetchSchedule,
+    required this.initParams,
   });
 
   final DateTime selectedDate;
   final Function(DateTime) createSchedule;
   final Function(ScheduleData) updateSchedule;
   final Function(DateTime) fetchSchedule;
+  final Function() initParams;
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +80,14 @@ class SchedulePageComponent extends StatelessWidget {
                         fontWeight: FontWeight.w500, fontSize: 20),
                   ),
                   IconButton(
-                    icon: const Icon(
-                      Icons.add,
-                      color: Colors.blue,
-                    ),
-                    onPressed: () => create(selectedDate),
-                  ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.blue,
+                      ),
+                      onPressed: () {
+                        initParams();
+                        create(selectedDate);
+                      }),
                 ],
               ),
             ),

@@ -29,6 +29,8 @@ class ScheduleNotifier extends StateNotifier<AsyncValue<List<ScheduleData>>> {
   }
 
   Future update(ScheduleData schedule) async {
+    print("object");
+    print(schedule.id);
     await _dataSource.updateSchedule(schedule);
     ref.refresh(scheduleNotifierProvider);
   }
