@@ -37,7 +37,7 @@ final scheduleToProvider = StateProvider.autoDispose<DateTime>((ref) {
   final targetDate = ref.watch(targetNewScheduleDateProvider);
   return targetSchedule != null
       ? targetSchedule.to
-      : targetDate.add(const Duration(hours: 1));
+      : targetDate.add(const Duration(minutes: 15));
 });
 
 /// 終日
