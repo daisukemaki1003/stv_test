@@ -75,11 +75,12 @@ class ScheduleEditPage extends ConsumerWidget {
 
     return ScheduleEditPageComoponent(
       isCreate: isCreate,
-      title: scheduleTitle.state,
-      from: scheduleFrom.state,
-      to: scheduleTo.state,
-      isAllDay: scheduleIsAllDay.state,
-      comment: scheduleComment.state,
+      appBarTitle: title,
+      scheduleTitle: scheduleTitle.state,
+      scheduleFrom: scheduleFrom.state,
+      scheduleTo: scheduleTo.state,
+      scheduleIsAllDay: scheduleIsAllDay.state,
+      scheduleComment: scheduleComment.state,
       titleOnChanged: (value) => write(scheduleTitle, value),
       fromOnChanged: (value) => write(scheduleFrom, value),
       toOnChanged: (value) => write(scheduleTo, value),

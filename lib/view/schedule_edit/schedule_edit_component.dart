@@ -10,11 +10,6 @@ class ScheduleEditPageComoponent extends StatefulWidget {
   const ScheduleEditPageComoponent({
     super.key,
     required this.isCreate,
-    required this.title,
-    required this.from,
-    required this.to,
-    required this.isAllDay,
-    required this.comment,
     required this.titleOnChanged,
     required this.fromOnChanged,
     required this.toOnChanged,
@@ -24,17 +19,25 @@ class ScheduleEditPageComoponent extends StatefulWidget {
     required this.onSave,
     required this.onDelete,
     required this.clearParams,
+    required this.scheduleTitle,
+    required this.scheduleFrom,
+    required this.scheduleTo,
+    required this.scheduleIsAllDay,
+    required this.scheduleComment,
+    required this.appBarTitle,
   });
 
   /// Mode
   final bool isCreate;
 
+  final String appBarTitle;
+
   /// State
-  final String title;
-  final DateTime from;
-  final DateTime to;
-  final bool isAllDay;
-  final String comment;
+  final String scheduleTitle;
+  final DateTime scheduleFrom;
+  final DateTime scheduleTo;
+  final bool scheduleIsAllDay;
+  final String scheduleComment;
 
   /// State変更時処理
   final Function(String) titleOnChanged;
@@ -75,7 +78,8 @@ class ScheduleEditPageComoponentState
   void _editing() {
     if (widget.isCreate) {
       setState(() {
-        isEdited = widget.title.isNotEmpty && widget.comment.isNotEmpty;
+        isEdited = widget.scheduleTitle.isNotEmpty &&
+            widget.scheduleComment.isNotEmpty;
       });
     } else {
       setState(() {
@@ -95,7 +99,7 @@ class ScheduleEditPageComoponentState
 
     /// 日付フォーマット
     final DateFormat dateFormat;
-    if (widget.isAllDay) {
+    if (widget.scheduleIsAllDay) {
       dateFormat = kScheduleEditPageDateFormatForAllDay; // 終日
     } else {
       dateFormat = kScheduleEditPageDateFormat;
@@ -104,7 +108,7 @@ class ScheduleEditPageComoponentState
     return Scaffold(
       backgroundColor: defaultColor,
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.appBarTitle),
         elevation: 0,
 
         /// 戻るボタン
@@ -138,7 +142,7 @@ class ScheduleEditPageComoponentState
                   padding: const EdgeInsets.only(bottom: 30),
                   child: titleInputField(
                     context: context,
-                    title: widget.title,
+                    title: widget.scheduleTitle,
                     onChanged: (value) {
                       widget.titleOnChanged(value);
                       _editing();
@@ -152,7 +156,7 @@ class ScheduleEditPageComoponentState
                     children: [
                       /// 終日選択ボタン
                       allDaySelectionButton(
-                          isAllDay: widget.isAllDay,
+                          isAllDay: widget.scheduleIsAllDay,
                           onChanged: (value) {
                             widget.isAllDayOnChanged(value);
                             _editing();
@@ -162,15 +166,15 @@ class ScheduleEditPageComoponentState
                       datePickerTile(
                         context: context,
                         title: "開始",
-                        selectedDate: widget.from,
+                        selectedDate: widget.scheduleFrom,
                         onChange: (value) {
                           widget.fromOnChanged(value);
-                          if (widget.isAllDay) {
-                            if (widget.to.isBefore(value)) {
+                          if (widget.scheduleIsAllDay) {
+                            if (widget.scheduleTo.isBefore(value)) {
                               widget.toOnChanged(value);
                             }
                           } else {
-                            if (widget.to.isBefore(value)) {
+                            if (widget.scheduleTo.isBefore(value)) {
                               widget.toOnChanged(
                                 value.add(const Duration(hours: 1)),
                               );
@@ -185,7 +189,7 @@ class ScheduleEditPageComoponentState
                       datePickerTile(
                         context: context,
                         title: "終了",
-                        selectedDate: widget.to,
+                        selectedDate: widget.scheduleTo,
                         onChange: (value) {
                           widget.toOnChanged(value);
                           _editing();
@@ -200,7 +204,7 @@ class ScheduleEditPageComoponentState
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: commentInputField(
-                    comment: widget.comment,
+                    comment: widget.scheduleComment,
                     onChanged: (value) {
                       widget.commentOnChanged(value);
                       _editing();
